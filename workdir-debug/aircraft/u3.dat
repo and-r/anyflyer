@@ -1,0 +1,92 @@
+(type) {powered_paraglider}
+(mass) {110}                 masa w kilogramach
+(cog) {0,0,0}             srodek masy w metrach
+(mominert) {460,66,530}   momenty bezwladnosci: xx, yy, zz, w kg*m^2
+(controlderiv) {1.5}           pochodna wspolczynnika powierzchni sterowej
+(fppcampos) {0,1,1}          polozenie kamery fpp
+(defaultspeed) {5}         domyslna predkosc-poczatkowa,m/s
+(compnum) {5}                liczba komponent?w        
+
+(0comptype) {1}           1-plat, centroplat
+(0location) {0,7.4,0}      m
+(0rotation) {7,0,0}       deg
+(0size) {14.2}               m^2
+(0chartid) {0}            id charakterystyki
+(0ar) {3.9}                 aspect ratio
+(0controlsize) {0}            powierzchnia steru/powierzchnia plata
+(0controlangleup) {0}           max angle up, deg
+(0controlangledown) {0}
+(0controlsensit) {0,0,0}        elevator sensitivity,rudder sens.,aileron sens.
+
+(1comptype) {1}           czesc prawa
+(1location) {3.7,6.3,-0.3}
+(1rotation) {4,0,-46}
+(1size) {5}
+(1controlsize) {0.1}
+(1controlangleup) {0}
+(1controlangledown) {80}
+(1controlsensit) {-1,0,-1}
+(1chartid) {0}
+(1ar) {3.9}
+
+(2comptype) {1}            czesc lewa
+(2location) {-3.7,6.3,-0.3}
+(2rotation) {4,0,46}
+(2size) {5}
+(2controlsize) {0.1}
+(2controlangleup) {0}
+(2controlangledown) {80}
+(2controlsensit) {-1,0,1}
+(2chartid) {0}
+(2ar) {3.9}
+
+(3comptype) {0}            0-kadlub
+(3location) {0,0,0}
+(3rotation) {0,0,0}
+(3length) {2}
+(3diameter) {2}
+(3cdcross) {0.5}   wspolczynnik oporu dla przekroju poprzecznego kadluba, odniesiony do maks.szerokosci kadluba razy dlugosc jednostkowa, 0.5 jest dla walca
+
+(4comptype) {2}            2-silnik
+(4location) {0,0,-0,3}
+(4rotation) {0,0,0}
+(4maxthrust) {530}       maksymalny ciag w niutonach, stand.atm. na poziomie morza
+
+(0c0) {0,0.25,-0.04}  charakterystyka nr0,kat0 stopni,y:CL,z:CD
+(0c1) {0,1.2,-0.08} charakterystyka nr 0, kat 10 stopni
+(0c2) {0,1,2,-0.2}
+(0c3) {0,0.9,-0.6}
+(0c4) {0,1.05,-0.9}
+(0c5) {0,1.05,-1.2}
+(0c6) {0,0.9,-1.5}
+(0c7) {0,0.65,-1.7}
+(0c8) {0,0.35,-1.8}
+(0c9) {0,0.05,-1.8}
+(0c10) {0,-0.25,-1.75}
+(0c11) {0,-0.5,-1.6}
+(0c12) {0,-0.75,-1.45}
+(0c13) {0,-0.9,-1.25}
+(0c14) {0,-0.95,-1}
+(0c15) {0,-0.85,-0.6}
+(0c16) {0,-0.65,-0.3}
+(0c17) {0,-0.85,-0.15}
+(0c18) {0,0,-0.03}
+
+(0c35) {0,-0.8,-0.052}
+(0c34) {0,-1,-0.15}
+(0c33) {0,-0.9,-0.6}
+(0c32) {0,-1.05,-0.9}
+(0c31) {0,-1.05,-1.2}
+(0c30) {0,-0.9,-1.5}
+(0c29) {0,-0.65,-1.7}
+(0c28) {0,-0.35,-1.8}
+(0c27) {0,-0.05,-1.8}
+(0c26) {0,0.25,-1.75}
+(0c25) {0,0.5,-1.6}
+(0c24) {0,0.75,-1.45}
+(0c23) {0,0.9,-1.25}
+(0c22) {0,0.95,-1}
+(0c21) {0,0.85,-0.6}
+(0c20) {0,0.65,-0.3}
+(0c19) {0,0.85,-0.15}
+
