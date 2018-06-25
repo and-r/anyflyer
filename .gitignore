@@ -2,7 +2,4 @@
 AnyFlyer
 *-vs/
 work*/Makefile
-work*/*.dll
 work*/*-vs*
-source/*.pro.user
-
