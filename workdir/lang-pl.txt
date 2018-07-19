@@ -1,0 +1,47 @@
+0 #nie znaleziono parametru xresolution w pliku settings.txt, przyjęto $
+1 #nie znaleziono parametru yresolution w pliku settings.txt, przyjeto $
+2 #nie znaleziono parametru drivertype w pliku settings.txt, przyjeto 5 (opengl)$
+3 #nie udalo sie utworzyc oswietlenia sceny$
+4 #nie udalo sie utworzyc animatora kamery$
+5 #Wyjscie$
+6 #Zaplanuj lot >$
+7 #Lec$
+8 #---$
+9 #---$
+10 #---$
+11 #---$
+12 #---$
+13 #Wyjdz do glownego menu$
+14 #Wybierz samolot >$
+15 #Plan lotu >$
+16 #Opis klawiatury i
+sterowania >$
+17 #---$
+18 #---$
+19 #ESC : menu
+Spacja,P : pauza
+Tab : tryb kamery
+Strzalki : obrot kamery lub ruch w menu
+Enter : zatwierdzenie elementu menu
+S: otwarcie przepustnicy
+A: zamkniecie przepustnicy
+Ruch myszy : drazek sterowy
+Rolka: trym steru poziomego
+Rolka myszy +Ctrl: przepustnica
+H : wskaznik HUD$
+20 #nie udalo sie otworzyc pliku:$
+21 #MOC:$
+22 #Menu(ESC)$
+23 #Uzyj klawiszy strzalek i enter$
+24 #Wybierz:$
+25 #Dodaj Samolot >$
+26 #Usun Samolot$
+27 #Ustaw Kurs >$
+28 #Ustaw Pulap >$
+29 #Wybranych Samolotow:$
+30 #, kurs:$
+31 #, pulap:$
+32 #Podnies$
+33 #Obniz$
+34 #Pauza - nacisnij
+spacje aby wylaczyc$

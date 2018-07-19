@@ -110,6 +110,9 @@ void SimMgr::BeginScene()
     pScene->setAmbientLight(video::SColorf(col,col,col,col));
     //ustawiamy kolor cienia
     pScene->setShadowColor(video::SColor(pSett->getVar<unsigned>("shadowintensity"),0,0,0));
+	//sky color
+	core::vector3df rgb = pSett->getVar<core::vector3df>("skycolor");
+	SkyColor = video::SColor(255, u32(rgb.X), u32(rgb.Y), u32(rgb.Z));
     //ustawiamy skale symboli HUD
     uHudScale=pSett->getVar<unsigned>("hudscale");
     for (int i=0;i<7;++i)  //mnożymy współrzędne punktów znaku "waterline" przez skale HUD
@@ -470,7 +473,7 @@ MENU_ANSW SimMgr::Menu()
         }
         //--------------------
 
-        pDriver->beginScene(true, true, video::SColor(255,120,120,150));
+        pDriver->beginScene(true, true, SkyColor);
         pScene->drawAll();
         p_mainmenu->Draw(MenuPos);
         p_prompt->Draw(PromptPos);
@@ -810,7 +813,7 @@ inline bool SimMgr::Input()//obsługa wejścia klawiatury, true - wyjście z pę
                }
             }
 
-			if (pReceiver->IsKeyPressed(irr::KEY_KEY_Q))
+			if (pReceiver->IsKeyPressed(irr::KEY_KEY_S))
 			{
 				uav->AddPower();  //drugi sposób zmiany mocy silnika
 			}
@@ -851,15 +854,15 @@ inline bool SimMgr::Input()//obsługa wejścia klawiatury, true - wyjście z pę
             pDevice->getCursorControl()->setPosition(s32(screenhalf.Width),s32(screenhalf.Height));
 
             //obliczanie parametru sterującego Yaw
-            if (pReceiver->IsKeyPressed(irr::KEY_KEY_Z))
+            if (pReceiver->IsKeyDown(irr::KEY_KEY_Z))
             {
-                fYawInput-=int(uFrameDeltaTime)*iMouseSpeed/300.0f;
+                fYawInput-=int(uFrameDeltaTime)*iMouseSpeed/1200.0f;
             }
             else
             {
-                if (pReceiver->IsKeyPressed(irr::KEY_KEY_X))
+                if (pReceiver->IsKeyDown(irr::KEY_KEY_X))
                 {
-                    fYawInput+=int(uFrameDeltaTime)*iMouseSpeed/300.0f;
+                    fYawInput+=int(uFrameDeltaTime)*iMouseSpeed/1200.0f;
                 }
             }
             fYawInput-=fYawInput*int(uFrameDeltaTime)*iMouseReturnSpeed/4000.0f;  //powrót do położenia 0
@@ -1079,7 +1082,7 @@ void SimMgr::Fly()noexcept  //zawiera pętlę symulacji - żeby przyspieszyć ro
 //            }
         }
         CamRotMatrix = pCamera->Update();  //aktualizacja położenia i skierowania kamery
-        pDriver->beginScene(true, true, video::SColor(255,120,120,150));
+        pDriver->beginScene(true, true, SkyColor);
         pScene->drawAll();
         DrawGui();
         pDriver->endScene();

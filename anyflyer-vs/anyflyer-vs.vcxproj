@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{4D8A0709-F672-4855-9B0A-3A71587CC39E}</ProjectGuid>
+    <RootNamespace>anyflyervs</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>C:\Users\Ja\Documents\Visual Studio 2017\Projects\irrlicht-1.8.4\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Ja\Documents\anyflyerrepo\anyflyer-vs\x64;C:\Users\Ja\Documents\Visual Studio 2017\Projects\irrlicht-1.8.4\lib\Win32-visualstudio;$(LibraryPath)</LibraryPath>
+    <SourcePath>C:\Users\Ja\Documents\anyflyerrepo\source;$(SourcePath)</SourcePath>
+    <ExecutablePath>C:\Users\Ja\Documents\anyflyerrepo\workdir;$(ExecutablePath)</ExecutablePath>
+    <OutDir>..\workdir</OutDir>
+    <TargetName>anyflyer32-debug</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>C:\Users\Ja\Documents\Visual Studio 2017\Projects\irrlicht-1.8.4\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Ja\Documents\Visual Studio 2017\Projects\irrlicht-1.8.4\lib\Win32-visualstudio;$(LibraryPath)</LibraryPath>
+    <SourcePath>C:\Users\Ja\Documents\anyflyerrepo\source;$(SourcePath)</SourcePath>
+    <OutDir>..\workdir</OutDir>
+    <TargetName>anyflyer32</TargetName>
+    <ExecutablePath>C:\Users\Ja\Documents\anyflyerrepo\workdir;$(ExecutablePath)</ExecutablePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\Users\Ja\Documents\Visual Studio 2017\Projects\irrlicht-1.8.4\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Ja\Documents\anyflyerrepo\anyflyer-vs\x64;C:\Users\Ja\Documents\Visual Studio 2017\Projects\irrlicht-1.8.4\lib\Win64-visualStudio;$(LibraryPath)</LibraryPath>
+    <SourcePath>C:\Users\Ja\Documents\anyflyerrepo\source;$(SourcePath)</SourcePath>
+    <ExecutablePath>C:\Users\Ja\Documents\anyflyerrepo\workdir;$(ExecutablePath)</ExecutablePath>
+    <OutDir>..\workdir</OutDir>
+    <TargetName>anyflyer64-debug</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>C:\Users\Ja\Documents\Visual Studio 2017\Projects\irrlicht-1.8.4\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Ja\Documents\Visual Studio 2017\Projects\irrlicht-1.8.4\lib\Win64-visualStudio;$(LibraryPath)</LibraryPath>
+    <SourcePath>C:\Users\Ja\Documents\anyflyerrepo\source;$(SourcePath)</SourcePath>
+    <OutDir>..\workdir</OutDir>
+    <TargetName>anyflyer64</TargetName>
+    <ExecutablePath>C:\Users\Ja\Documents\anyflyerrepo\workdir;$(ExecutablePath)</ExecutablePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\source\camera.h" />
+    <ClInclude Include="..\source\dictionary.h" />
+    <ClInclude Include="..\source\flightplan.h" />
+    <ClInclude Include="..\source\menulist.h" />
+    <ClInclude Include="..\source\prompt.h" />
+    <ClInclude Include="..\source\secontainer.h" />
+    <ClInclude Include="..\source\settingsmgr.h" />
+    <ClInclude Include="..\source\simeventreceiver.h" />
+    <ClInclude Include="..\source\simulation_manager.h" />
+    <ClInclude Include="..\source\uavarray.h" />
+    <ClInclude Include="..\source\uavnode.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\source\anyflyer_main.cpp" />
+    <ClCompile Include="..\source\camera.cpp" />
+    <ClCompile Include="..\source\dictionary.cpp" />
+    <ClCompile Include="..\source\flightplan.cpp" />
+    <ClCompile Include="..\source\menu.cpp" />
+    <ClCompile Include="..\source\menulist.cpp" />
+    <ClCompile Include="..\source\settingsmgr.cpp" />
+    <ClCompile Include="..\source\simeventreceiver.cpp" />
+    <ClCompile Include="..\source\simulation_manager.cpp" />
+    <ClCompile Include="..\source\uavarray.cpp" />
+    <ClCompile Include="..\source\uavnode.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

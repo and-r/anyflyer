@@ -5,24 +5,15 @@ UavNode* UavArray::Add(int type=0, COURSE course, float alt)
 {
     if (pDevice)
     {
-        //próbujemy załadować mesh i teksturę z plików
-        string dronemeshpath("aircraft/u"+to_string(type)+".3ds");  //budujemy nazwę pliku
-        scene::IMesh* mesh=pDevice->getSceneManager()->getMesh(dronemeshpath.data());
+        //próbujemy załadować mesh
+        string acmeshpath("aircraft/u"+to_string(type)+".3ds");  //budujemy nazwę pliku
+        scene::IMesh* mesh=pDevice->getSceneManager()->getMesh(acmeshpath.data());
         if(!mesh)
         {
             SimExceptContainer capsule;
             //nie ustawiamy żadnego tekstu, bo irrlicht rzuca swój wyjątek i pokazuje opis w konsoli
             throw capsule;  //nie znaleziono mesha -rzucamy wyjątek
         }
-        string dronetexturepath("aircraft/u"+to_string(type)+".jpg");  //budujemy nazwę pliku
-        video::ITexture* texture=pDevice->getVideoDriver()->getTexture(dronetexturepath.data());
-        if (!texture)
-        {
-            SimExceptContainer capsule;
-            //nie ustawiamy żadnego tekstu, bo irrlicht rzuca swój wyjątek i pokazuje opis w konsoli
-            throw capsule;
-        }
-        //wszystko się załadowało
 
         if (iNum==0)   //możemy utworzyć pierwszego drona
         {
@@ -39,22 +30,38 @@ UavNode* UavArray::Add(int type=0, COURSE course, float alt)
             delete pArray;  //usuwamy starą tablicę wskaźników, ale nie obiekty pod tymi wskaźnikami
             pArray=newarray;  //wskaźnik - zmienną obiektową, ustawiamy na nową tablicę
         }
-        //teraz możemy utworzyć nowego drona na ostatniej pozycji tablicy
-        pArray[iNum] = new UavNode(pDevice->getSceneManager()->getRootSceneNode(),pDevice->getSceneManager(),type,mesh);  //utworzenie pierwszego drona
-        for (int i=0;i<pArray[iNum]->getMaterialCount();++i)
-        {
-                pArray[iNum]->getMeshChild()->getMaterial(i).setTexture(0,texture);
-                //pArray[iNum]->getMaterial(i).setTexture(0,texture);//ustawia tą samą teksturę dla każdego mesh buffera
-                //pArray[iNum]->getMaterial(i).ColorMaterial=video::ECM_NONE;
-                pArray[iNum]->getMaterial(i).AmbientColor.setAlpha(255);
-                pArray[iNum]->getMaterial(i).AmbientColor.setRed(255);
-                pArray[iNum]->getMaterial(i).AmbientColor.setGreen(255);
-                pArray[iNum]->getMaterial(i).AmbientColor.setBlue(255);
-        }
-        //ustawiamy położenie i kurs, ustawiamy maszyne w formacji z innymi
+        //now we can create a new aircraft on the last position of the array
+        pArray[iNum] = new UavNode(pDevice->getSceneManager()->getRootSceneNode(),pDevice->getSceneManager(),type,mesh);  //creation of the new aircraft
+		string aircrafttexturepath("aircraft/u" + to_string(type) + '-');  //building of texture initial path
+			for (int i = 0; i < pArray[iNum]->getMaterialCount(); ++i)
+			{
+				string meshbuftexture = string(aircrafttexturepath + to_string(i) + ".jpg");
+				video::ITexture* p_texture = pDevice->getVideoDriver()->getTexture(meshbuftexture.data());
+				if (!p_texture)
+				{
+					if (i == 0)
+					{
+						//exception - there must be at least 1 texture for each aircraft
+						SimExceptContainer capsule{};
+						//nie ustawiamy żadnego tekstu, bo irrlicht pokazuje swój komunikat w konsoli
+						throw capsule;
+					}
+					meshbuftexture = string(aircrafttexturepath + "0.jpg");  //if there is not enough texture files for mesh buffer number, use texture 0
+				}
+				//here, everytihng is loaded
+
+				pArray[iNum]->getMeshChild()->getMaterial(i).setTexture(0, p_texture);
+
+				pArray[iNum]->getMaterial(i).AmbientColor.setAlpha(255);
+				pArray[iNum]->getMaterial(i).AmbientColor.setRed(255);
+				pArray[iNum]->getMaterial(i).AmbientColor.setGreen(255);
+				pArray[iNum]->getMaterial(i).AmbientColor.setBlue(255);
+			}
+		
+        //here we are setting position, course, including the aircraft's position in formation
         core::vector3df position(float(iNum*50),float(alt),float(-iNum*50));
         core::vector3df speed(0,0,1);
-        float angle = static_cast<float>(course)*45;  //zamiana enuma na kąt w stopniach
+        float angle = static_cast<float>(course)*45;  //change to angle in degrees
         core::matrix4 M;
         M.setRotationDegrees(core::vector3df(0,angle,0));
         M.rotateVect(position);

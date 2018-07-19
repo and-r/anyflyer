@@ -1,0 +1,56 @@
+(langfile) {lang-pl.txt}        file containing texts in certain language
+
+(xresolution) {1024}            initial window horizontal resolution
+
+(yresolution) {768}             initial window vertical resolution
+
+(drivertype) {5}                1:software, 2:burningsvideo, 5:opengl
+
+(mapname) {terrain40x40_mod1}   name of files with map
+
+(ambientlightlevel) {0.2}       
+
+(lightradius) {600000}          range of the light which casts shadow
+
+(light_x) {0}
+(light_y) {20000}
+(light_z) {-60000}
+(lightpicturesize) {6000}       size of the picture of sun
+(lightlevel) {0.2}
+
+(shadowintensity) {150}         shadow intensity, 0-none, 255-completely black
+(skycolor) {100,100,160}        color of the sky
+(font1) {fontcourier.bmp}
+
+(gaccel) {9.81}                 earth acceleration
+
+(rozero) {1.225}                air density at sea level, kg/m^3
+
+(tzero) {288}                   temperature at sea level, K
+
+(ni) {1.48e-5}                  kinematic viscosity of air
+
+(vintegralfunc) {1}             0:Euler's integration, 1:trapese
+
+(qintegralfunc) {1}             0:Euler's integration, 1:trapese
+
+(cameraanglestep) {20}          angle of one camera step
+
+(hudscale) {2}                  scale of HUD symbols
+
+(hudcolorred) {50}              color of HUD symbols
+
+(hudcolorgreen) {255}
+
+(hudcolorblue) {50}
+
+(paramrefresh) {20}             co ile klatek odswiezyc wyswietlane parametry
+(imperialunits) {0}             0: metry,km/h 1:stopy,kts
+
+(mousespeed) {3}               liczba calkowita, charakterystyka sterowania
+
+(mousereturnspeed) {4}         liczba calkowita, charakterystyka sterowania
+
+(trimstep) {3}                 liczba calkowita, krok trymu sterów
+
+(minframedelay) {15}           minimum delay between frames in miliseconds

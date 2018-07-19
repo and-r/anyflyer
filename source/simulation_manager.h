@@ -48,6 +48,7 @@ private:
     bool bControlled = true;  //czy dron jest kontrolowany (ten który jest śledzony przez kamerę)
     core::matrix4 CamRotMatrix;
     video::SColor HudColor;
+	video::SColor SkyColor;
     unsigned uHudScale;
     unsigned uParamRefresh;
     unsigned uFrameDeltaTime;  //parametr obiektu - jest potrzebny w wielu miejscach

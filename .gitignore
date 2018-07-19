@@ -1,5 +1,7 @@
 *.o
-AnyFlyer
-*-vs/
-work*/Makefile
-work*/*-vs*
+*.obj
+*.iobj
+*.ilk
+*.pdb
+*.ipdb
+
