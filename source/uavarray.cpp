@@ -43,7 +43,7 @@ UavNode* UavArray::Add(int type=0, COURSE course, float alt)
 					{
 						//exception - there must be at least 1 texture for each aircraft
 						SimExceptContainer capsule{};
-						//nie ustawiamy żadnego tekstu, bo irrlicht pokazuje swój komunikat w konsoli
+                        //we do not set any text for exception, because Irrlicht shows it's own
 						throw capsule;
 					}
 					meshbuftexture = string(aircrafttexturepath + "0.jpg");  //if there is not enough texture files for mesh buffer number, use texture 0
@@ -51,13 +51,11 @@ UavNode* UavArray::Add(int type=0, COURSE course, float alt)
 				//here, everytihng is loaded
 
 				pArray[iNum]->getMeshChild()->getMaterial(i).setTexture(0, p_texture);
-
 				pArray[iNum]->getMaterial(i).AmbientColor.setAlpha(255);
 				pArray[iNum]->getMaterial(i).AmbientColor.setRed(255);
 				pArray[iNum]->getMaterial(i).AmbientColor.setGreen(255);
 				pArray[iNum]->getMaterial(i).AmbientColor.setBlue(255);
 			}
-		
         //here we are setting position, course, including the aircraft's position in formation
         core::vector3df position(float(iNum*50),float(alt),float(-iNum*50));
         core::vector3df speed(0,0,1);
@@ -78,7 +76,7 @@ UavNode* UavArray::Add(int type=0, COURSE course, float alt)
 //        pArray[iNum]->setRotation(core::vector3df(0,0,0));  //w stopniach
 //        pArray[iNum]->RotSpeed=core::vector3df(0,0,0);   //w radianach
         pArray[iNum]->updateAbsolutePosition();
-        ++iNum;  //licznik dronów powiększa się o 1
+        ++iNum;  //licznik maszyn powiększa się o 1
         return pArray[iNum-1];  //metoda zwraca wskaźnik do właśnie utworzonego drona
     }
     return nullptr;

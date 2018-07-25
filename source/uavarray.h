@@ -26,7 +26,7 @@ public:
         DeleteAll();
     }
 
-    UavNode* Add(int type,COURSE course = COURSE::N,float alt = 1000.0f);   //dodaje pojedynczego drona do tablicy
+    UavNode* Add(int type,COURSE course = COURSE::N,float alt = 1000.0f);   //dodaje pojedynczy samolot do tablicy
     void LoadData(UavNode*);  //wywoływana w Add, wczytuje dane maszyny z pliku u(liczba).dat
     void DeleteAll()
     {
@@ -47,7 +47,7 @@ public:
 
     int getNum()const
     {
-        return iNum;  //zwraca aktualną ilość dronów
+        return iNum;  //zwraca aktualną ilość samolotów
     }
 
     UavNode* getUav(int index)

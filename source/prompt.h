@@ -74,7 +74,7 @@ public:
     }
     virtual void Switch(int index)
     {
-        if (bVisible && vList.size()>0 &&iCurrent>=0)
+        if (vList.size()>0 &&iCurrent>=0)
         {
             if (index >= 0 && index < vList.size())
             {

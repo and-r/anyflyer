@@ -259,6 +259,10 @@ MENU_ANSW SimMgr::Menu()
     item2.eANSWER=MENU_ANSW::NOTHING;
     lista.push_back(item2);
 
+	item2.sDescription = pDict->get(35).c_str();  //"scene preparation"
+	item2.eANSWER = MENU_ANSW::NOTHING;
+	lista.push_back(item2);
+
     Prompt* p_prompt=new Prompt(pFont1,lista,0,video::SColor(255,0,0,128));
     lista.clear();
     //---------------
@@ -454,12 +458,6 @@ MENU_ANSW SimMgr::Menu()
             p_prompt->Modify(MenuItem(getFlightPlan()),1);
             break;
         }
-
-        if (answer.eANSWER == MENU_ANSW::EXITAPP || answer.eANSWER == MENU_ANSW::FLY)
-        {
-           functionanswer=answer;
-           break;  //wyjscie z petli a pozniej z funkcji Menu
-        }
         //--------------------------------
 
         //aktualizujemy prompt
@@ -473,11 +471,29 @@ MENU_ANSW SimMgr::Menu()
         }
         //--------------------
 
+
+		//dwa przypadki powodujace wyjscie z funkcji Menu, czesc dalsza bedzie po wyswietleniu zmian (w prompcie)
+		if (answer.eANSWER == MENU_ANSW::EXITAPP)
+		{
+			functionanswer = answer;
+		}
+		if (answer.eANSWER == MENU_ANSW::FLY)
+		{
+			p_prompt->Switch(2);
+			functionanswer = answer;
+		}
+		//-----------------------------------------------
+
         pDriver->beginScene(true, true, SkyColor);
         pScene->drawAll();
         p_mainmenu->Draw(MenuPos);
         p_prompt->Draw(PromptPos);
         pDriver->endScene();
+
+		if (answer.eANSWER == MENU_ANSW::FLY || answer.eANSWER == MENU_ANSW::EXITAPP)
+		{
+			break;  //wyjscie z petli a pozniej z funkcji Menu
+		}
     }
     camera->remove();
     delete p_mainmenu;
@@ -554,7 +570,7 @@ void SimMgr::LoadPlan(int choice=0)
     item.eANSWER=MENU_ANSW::MAINMENU;
     lista.push_back(item);
 
-    item.sDescription=pDict->get(14).c_str();  //"wybierz drona"
+    item.sDescription=pDict->get(14).c_str();  //"wybierz samolot"
     item.eANSWER=MENU_ANSW::CHOOSEUAV;
     lista.push_back(item);
 
@@ -593,6 +609,7 @@ void SimMgr::LoadPlan(int choice=0)
         lista.push_back(item3);
     }
     pmenu = new MenuList(pFont1,lista);
+    pmenu->Switch(lista.size()-1);  //ustawiamy na ostatni element bo zaraz wsiadziemy do ostatniego samolotu
     if (!pSimMenuList->SetSubmenu(MENU_ANSW::CHOOSEUAV,pmenu))
     {
         delete pmenu;// nie udalo sie podczepic do menu wyzszego poziomu, niszczymy to menu
@@ -602,12 +619,12 @@ void SimMgr::LoadPlan(int choice=0)
 
     //tworzymy menu prompt
     MenuItem item4{};
-    item4.sDescription = pDict->get(22).c_str();
+    item4.sDescription = pDict->get(22).c_str(); //"MENU(ESC)"
     item4.eANSWER =MENU_ANSW::NOTHING;
     item4.iParameter = 1;
     lista.push_back(item4);
 
-    item4.sDescription = pDict->get(23).c_str();
+    item4.sDescription = pDict->get(23).c_str();  //"Uzyj klawiszy strzalek i enter"
     item4.eANSWER = MENU_ANSW::NOTHING;
     item4.iParameter = 2;
     lista.push_back(item4);
@@ -634,7 +651,7 @@ void SimMgr::LoadPlan(int choice=0)
     pScene->setActiveCamera(pCamera->getIrrCamera());
     //---------------
 
-    pCamera->Attach(pUavArr->getUav(0),CAMERASTATE::FP);//wsiadamy do pierwszego samolotu
+    pCamera->Attach(pUavArr->getUav(pUavArr->getNum()-1),CAMERASTATE::FP);//wsiadamy do ostatniego samolotu
 
 
     bPause=true;     //rozpoczynamy od pauzy
@@ -994,12 +1011,16 @@ inline void SimMgr::DrawHud()
         if (bImperialUnits)
         {
            airspeedstring=to_wstring(static_cast<int>(pCamera->GetSelectedUav()->Speed.getLength()*1.9438f)).c_str();  //liczba całkowita, kts
+           airspeedstring+=" kts";
            altitudestring=to_wstring(static_cast<int>(pCamera->GetSelectedUav()->getPosition().Y*3.2808f)).c_str();  //stopy
+           altitudestring+=" ft";
         }
         else
         {
            airspeedstring=to_wstring(static_cast<int>(pCamera->GetSelectedUav()->Speed.getLength()*3.6)).c_str();  //liczba całkowita, km/h
+           airspeedstring+=" km/h";
            altitudestring=to_wstring(static_cast<int>(pCamera->GetSelectedUav()->getPosition().Y)).c_str();  //metry
+           altitudestring+=" m";
         }
         //teraz heading
         headingstring=L"H ";
