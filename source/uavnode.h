@@ -341,16 +341,40 @@ protected:
 			{
 			case COMPONENTTYPE::FUSELAGE:
 			{
-				core::vector3df compairspeed = uavairspeed;
+                core::vector3df compairspeed = (RotSpeed.crossProduct(pComp[i].Location)) + uavairspeed;  //obliczenie predkosci w kadlubie - ukl aircraft
+                core::vector3df airspeedcomp(pComp[i].Xvector.dotProduct(compairspeed),pComp[i].Yvector.dotProduct(compairspeed),
+                                             pComp[i].Zvector.dotProduct(compairspeed));  //to samo co compairspeed, ale bez uzycia macierzy Rotation /uklad aircraft
+                core::vector3df airspeedcompXY(airspeedcomp.X,airspeedcomp.Y,0);  //projection of comp speed to XY plane
+                float fusaoa2 = atan(airspeedcompXY.getLength()/airspeedcomp.Z);
+                float speedmodule = compairspeed.getLength();
+                float sinfusaoa = sin(fusaoa2);
+                float normalforce = pComp[i].FuselageP.fCcyl*speedmodule*speedmodule*sinfusaoa*sinfusaoa;
+                float cosfusaoa = cos(fusaoa2);
+                float axialforce = pComp[i].FuselageP.fCstream*pow(speedmodule, 1.8)*cosfusaoa*cosfusaoa;
+                core::vector3df compforce = airspeedcomp;
+                compforce.normalize();
+                compforce.X *= normalforce;
+                compforce.Y *= normalforce;
+                compforce.Z *= -axialforce;
+
+
+
+                //-------stare rozwiazanie
 				pComp[i].Rotation.inverseRotateVect(compairspeed);  //obrót predkosci do ukladu komponentu
 				core::vector3df yforward(compairspeed.X, -compairspeed.Z, -compairspeed.Y);  //wektor compairspeed obrocony osia Y do przodu
 				float fusaoa = 90 - yforward.getHorizontalAngle().X;  //kąt odchylenia wektora prędkości od osi Z kadłuba w stopniach
 
+                if (!(cntr%20))
+                {
+                     cout<<"aoa2="<<fusaoa2*180/PI<<endl;
+                     cout<<"aoa="<<fusaoa<<endl<<endl;
+                }
+
 				fusaoa *= PI / 180;  //teraz w radianach
-				float speedmodule = compairspeed.getLength();
+
 				float fusdrag = pComp[i].FuselageP.fCstream*pow(speedmodule, 1.8)*cos(fusaoa)*cos(fusaoa) +
 					pComp[i].FuselageP.fCcyl*speedmodule*speedmodule*sin(fusaoa)*sin(fusaoa);
-				core::vector3df compforce = -compairspeed.normalize();  //z minusem bo wektor siły działa w dokładnie odwrotną stronę niż prędkość
+                compforce = -compairspeed.normalize();  //z minusem bo wektor siły działa w dokładnie odwrotną stronę niż prędkość
 				compforce *= fusdrag;  //wektor siły gotowy - w układzie komponentu
 				pComp[i].Rotation.rotateVect(compforce);  //obrót do układu drona
 				forcetotal += compforce;  //dodajemy siłe do wektora głównego siły
