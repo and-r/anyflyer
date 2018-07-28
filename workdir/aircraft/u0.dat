@@ -3,7 +3,7 @@
 (cog) {0,0,0}             srodek masy w metrach
 (mominert) {48000,60000,12000}   momenty bezwladnosci: xx, yy, zz, w kg*m^2
 (controlderiv) {1.5}           pochodna wspolczynnika powierzchni sterowej
-(fppcampos) {0,1,3}          polozenie kamery fpp
+(fppcampos) {0,1,4}          polozenie kamery fpp
 (defaultspeed) {140}         domyslna predkosc-poczatkowa,m/s
 (compnum) {6}                liczba komponentów        
 
@@ -31,7 +31,7 @@
 
 (2comptype) {1}            skrzydlo prawe
 (2location) {3.83,0,-0.1}
-(2rotation) {0,0,3}
+(2rotation) {0,0,2}
 (2size) {7.5}
 (2controlsize) {0.12}
 (2controlangleup) {25}
@@ -42,7 +42,7 @@
 
 (3comptype) {1}            skrzydlo lewe
 (3location) {-3.83,0,-0.1}
-(3rotation) {0,0,-3}
+(3rotation) {0,0,-2}
 (3size) {7.5}
 (3controlsize) {0.12}
 (3controlangleup) {25}
