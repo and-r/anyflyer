@@ -399,14 +399,14 @@ protected:
 				//                float vsquarey=compairspeed.Y*compairspeed.Y;  //predkosc Y do kwadratu
 				//                float vsquarez=compairspeed.Z*compairspeed.Z; //predkosc Z do kwadratu
 
-//				                if (!(cntr%20)&&(i==4||i==5))
-//				                {
-//				                  cout<<i<<" comp, thisindex="<<thisindex<<" nextindex="<<nextindex<<endl;
-//				                  cout<<i<<" comp, compairspeed="<<compairspeed<<endl;
-//				                  cout<<i<<" comp, angleofattack="<<angleofattack<<endl;
-//				                  cout<<i<<" thisvector="<<pComp[i].FoilP.Chart[thisindex]<<endl;
-//				                  cout<<i<<" nextvector="<<pComp[i].FoilP.Chart[nextindex]<<endl;
-//				                }
+                                //if (!(cntr%20)&&(i==4||i==5))
+                                //{
+                                  //cout<<i<<" comp, thisindex="<<thisindex<<" nextindex="<<nextindex<<endl;
+                                  //cout<<i<<" comp, compairspeed="<<compairspeed<<endl;
+                                  //cout<<i<<" comp, angleofattack="<<angleofattack<<endl;
+                                  //cout<<i<<" thisvector="<<pComp[i].FoilP.Chart[thisindex]<<endl;
+                                  //cout<<i<<" nextvector="<<pComp[i].FoilP.Chart[nextindex]<<endl;
+                                //}
 				chartforce *= (vsquarey + vsquarez);  //mnożymy półprodukt przez prędkość do kwadratu
 				core::vector3df dragforce = compairspeed;
 				dragforce.normalize();

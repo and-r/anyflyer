@@ -2,60 +2,60 @@
 (mass) {3000}                 masa w kilogramach
 (cog) {0,0,0}             srodek masy w metrach
 (mominert) {48000,60000,12000}   momenty bezwladnosci: xx, yy, zz, w kg*m^2
-(controlderiv) {1.5}           pochodna wspolczynnika powierzchni sterowej
+(controlderiv) {2}           pochodna wspolczynnika powierzchni sterowej
 (fppcampos) {0,1,4}          polozenie kamery fpp
 (defaultspeed) {140}         domyslna predkosc-poczatkowa,m/s
-(compnum) {6}                liczba komponentÃ³w        
+(compnum) {6}                liczba komponentów        
 
 (0comptype) {1}           1-plat, statecznik poziomy
-(0location) {0,0,-4}      m
+(0location) {0,1.1,-5.2}      m
 (0rotation) {2,0,0}       deg
-(0size) {5}               m^2
-(0controlsize) {0.5}            powierzchnia steru/powierzchnia plata
-(0controlangleup) {25}           max angle up, deg
-(0controlangledown) {25}        max angle down, deg
+(0size) {3.4}               m^2
+(0controlsize) {0.35}            powierzchnia steru/powierzchnia plata
+(0controlangleup) {28}           max angle up, deg
+(0controlangledown) {18}        max angle down, deg
 (0controlsensit) {1,0,0}        elevator sensitivity,rudder sens.,aileron sens.
 (0chartid) {0}            id of chart
-(0ar) {2.5}                 aspect ratio
+(0ar) {2.1}                 aspect ratio
 
 (1comptype) {1}           statecznik pionowy
-(1location) {0,1.5,-4}
+(1location) {0,1.7,-5.3}
 (1rotation) {0,0,-90}
-(1size) {2.5}
-(1controlsize) {0.4}
-(1controlangleup) {30}
-(1controlangledown) {30}
+(1size) {1.8}
+(1controlsize) {0.3}
+(1controlangleup) {27}
+(1controlangledown) {27}
 (1controlsensit) {0,1,0}
 (1chartid) {0}
-(1ar) {2.5}
+(1ar) {2.1}
 
 (2comptype) {1}            skrzydlo prawe
-(2location) {3.83,0,-0.1}
+(2location) {3.6,0,-0.1}
 (2rotation) {0,0,2}
-(2size) {7.5}
-(2controlsize) {0.12}
-(2controlangleup) {25}
-(2controlangledown) {25}
+(2size) {8.75}
+(2controlsize) {0.076}
+(2controlangleup) {10}
+(2controlangledown) {10}
 (2controlsensit) {0,0,1}
-(2chartid) {0}
-(2ar) {3,33}
+(2chartid) {1}
+(2ar) {2.86}
 
 (3comptype) {1}            skrzydlo lewe
-(3location) {-3.83,0,-0.1}
+(3location) {-3.6,0,-0.1}
 (3rotation) {0,0,-2}
-(3size) {7.5}
-(3controlsize) {0.12}
-(3controlangleup) {25}
-(3controlangledown) {25}
+(3size) {8.75}
+(3controlsize) {0.076}
+(3controlangleup) {10}
+(3controlangledown) {10}
 (3controlsensit) {0,0,-1}
-(3chartid) {0}
-(3ar) {3,33}
+(3chartid) {1}
+(3ar) {2.86}
 
 (4comptype) {0}            component type 0-fuselage
 (4location) {0,0,0}
 (4rotation) {0,0,0}
 (4length) {10}
-(4diameter) {1}
+(4diameter) {1.2}
 (4cdcross) {0.5}   wspolczynnik oporu dla przekroju poprzecznego kadluba, odniesiony do maks.szerokosci kadluba razy dlugosc jednostkowa, 0.5 jest dla walca
 
 (5comptype) {2}            component type 2-engine
@@ -63,7 +63,7 @@
 (5rotation) {0,0,0}
 (5maxthrust) {10800}       max thrust at sea level, standard atmosphere
 
-(0c0) {0,0,-0.006}  chart no 0, angle 0 deg
+(0c0) {0,0,-0.006}  chart no 0, angle 0 deg, naca0012
 (0c1) {0,1.1,-0.013} chart no 0, angle 10 deg
 (0c2) {0,0.7,-0.3}
 (0c3) {0,0.9,-0.6}
@@ -100,4 +100,42 @@
 (0c21) {0,0.85,-0.6}
 (0c20) {0,0.65,-0.3}
 (0c19) {0,0.85,-0.15}
+
+(1c0) {0,0.18,-0.005}  chart no 1, angle 0 deg, naca63209
+(1c1) {0,1.13,-0.03}   chart no 1, angle 10 deg
+(1c2) {0,0.7,-0.3}
+(1c3) {0,0.9,-0.6}
+(1c4) {0,1.05,-0.9}
+(1c5) {0,1.05,-1.2}
+(1c6) {0,0.9,-1.5}
+(1c7) {0,0.65,-1.7}
+(1c8) {0,0.35,-1.8}
+(1c9) {0,0.05,-1.8}
+(1c10) {0,-0.25,-1.75}
+(1c11) {0,-0.5,-1.6}
+(1c12) {0,-0.75,-1.45}
+(1c13) {0,-0.9,-1.25}
+(1c14) {0,-0.95,-1}
+(1c15) {0,-0.85,-0.6}
+(1c16) {0,-0.65,-0.3}
+(1c17) {0,-0.85,-0.15}
+(1c18) {0,0,-0.03}
+
+(1c35) {0,-0.5,-0.06}
+(1c34) {0,-0.7,-0.3}
+(1c33) {0,-0.9,-0.6}
+(1c32) {0,-1.05,-0.9}
+(1c31) {0,-1.05,-1.2}
+(1c30) {0,-0.9,-1.5}
+(1c29) {0,-0.65,-1.7}
+(1c28) {0,-0.35,-1.8}
+(1c27) {0,-0.05,-1.8}
+(1c26) {0,0.25,-1.75}
+(1c25) {0,0.5,-1.6}
+(1c24) {0,0.75,-1.45}
+(1c23) {0,0.9,-1.25}
+(1c22) {0,0.95,-1}
+(1c21) {0,0.85,-0.6}
+(1c20) {0,0.65,-0.3}
+(1c19) {0,0.85,-0.15}
 
