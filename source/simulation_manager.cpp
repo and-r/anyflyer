@@ -219,6 +219,14 @@ MENU_ANSW SimMgr::Menu()
     //scene::ICameraSceneNode* camera = pScene->addCameraSceneNodeFPS();
     scene::ISceneNodeAnimator* anim = pScene->createFlyCircleAnimator(center,(terrainbox.getExtent().getLength()/4),0.0001f,core::vector3df(0,1,0));//tworzymy animatora
     //scene::ISceneNodeAnimator* anim = pScene->createFlyCircleAnimator(center,5000.0f,0.001f,core::vector3df(1,0,0));//tworzymy animatora
+	//let's set window caption: app name and version
+#ifndef _DEBUG
+	wstring caption = L"AnyFlyer ";
+	caption += wstring(cVersion);
+	caption += L" - main menu";
+	pDevice->setWindowCaption(caption.c_str());
+#endif
+	//----------------------------------------------
     if (anim)
     {
         camera->addAnimator(anim);
@@ -650,6 +658,14 @@ void SimMgr::LoadPlan(int choice=0)
     pCamera->getIrrCamera()->setPosition(core::vector3df(0,50,-20));
     pScene->setActiveCamera(pCamera->getIrrCamera());
     //---------------
+	//let's set window caption with app name and version
+#ifndef _DEBUG
+	wstring caption = L"AnyFlyer ";
+	caption += wstring(cVersion);
+	caption += L" - simulation";
+	pDevice->setWindowCaption(caption.c_str());
+#endif
+	//--------------------------------------------------
 
     pCamera->Attach(pUavArr->getUav(pUavArr->getNum()-1),CAMERASTATE::FP);//wsiadamy do ostatniego samolotu
 
@@ -671,7 +687,6 @@ void SimMgr::ResetPlan()
     pInfotext = nullptr;
     pUavArr->DeleteAll();  //kasujemy drony i ich tablicę
     pDevice->getCursorControl()->setVisible(true);
-
 }
 
 inline bool SimMgr::Input()//obsługa wejścia klawiatury, true - wyjście z pętli symulacji
@@ -1041,7 +1056,7 @@ inline void SimMgr::DrawHud()
     pFont1->draw(headingstring,headrect,HudColor,true,true);
 }
 
-void SimMgr::Fly()noexcept  //zawiera pętlę symulacji - żeby przyspieszyć robimy noexcept
+void SimMgr::Fly()noexcept  //it consists of simulation loop - to speed up, it is noexcept
 {
 
     UavNode** uavarray = pUavArr->getArray();
@@ -1050,21 +1065,25 @@ void SimMgr::Fly()noexcept  //zawiera pętlę symulacji - żeby przyspieszyć ro
     u32 tstart=tminus1;
     while(pDevice->run())
     {
-        //najpierw zbieramy aktualny czas i obliczamy różnicę od poprzedniej klatki
+        //at first we collect current time and calculate difference to the previous frame
         tzero=pDevice->getTimer()->getTime();
-        if (tzero - tminus1 < iFrameDelay)  //różnica mniejsza niz dopuszczalna, trzeba poczekac
+        if (tzero - tminus1 < iFrameDelay)  //difference is lower than acceptable, need to wait
 		{
 #ifdef _IRR_WINDOWS_
-            Sleep(iFrameDelay - (tzero - tminus1));  //WINDOWS, funkcja czekania
+            Sleep(iFrameDelay - (tzero - tminus1));  //WINDOWS, delay function
 #endif
 #ifndef _IRR_WINDOWS_
             timespec req{},rem{};
             req.tv_nsec=(iFrameDelay-(tzero-tminus1))*1000000;
-            nanosleep(&req,&rem);  //Linux, funkcja czekania
+            nanosleep(&req,&rem);  //Linux, delay function
 #endif
-			tzero = pDevice->getTimer()->getTime();  //znowu bierzemy aktualny czas
+			tzero = pDevice->getTimer()->getTime();  //again we take current time
 		}
-        uFrameDeltaTime=(tzero-tminus1 > 0 ? tzero-tminus1 : 1);  //framedeltatime powinien wynosić conajmniej 1 ms
+        uFrameDeltaTime=(tzero-tminus1 > 0 ? tzero-tminus1 : 1);  //framedeltatime should be at least 1 ms
+		if (uFrameDeltaTime > 300) //protection against too long lags, induced (the most often) by some external processes
+		{
+			uFrameDeltaTime = 300;
+		}
         tminus1=tzero;
         //-------------------------------------------------------------------------
 
@@ -1107,8 +1126,11 @@ void SimMgr::Fly()noexcept  //zawiera pętlę symulacji - żeby przyspieszyć ro
         pScene->drawAll();
         DrawGui();
         pDriver->endScene();
+#ifdef _DEBUG
         int fps = pDriver->getFPS();
-        wstring caption=to_wstring(uFrameDeltaTime);
-        pDevice->setWindowCaption(caption.c_str());
+		wstring caption = to_wstring(uFrameDeltaTime);
+		pDevice->setWindowCaption(caption.c_str());
+#endif
+        
     }
 }

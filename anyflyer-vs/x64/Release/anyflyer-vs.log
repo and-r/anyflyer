@@ -1,52 +1,4 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(373,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
-  anyflyer_main.cpp
-c:\users\ja\documents\anyflyerrepo\source\menulist.h(115): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-c:\users\ja\documents\anyflyerrepo\source\uavnode.h(11): warning C4305: 'initializing': truncation from 'double' to 'const float'
-c:\users\ja\documents\anyflyerrepo\source\uavnode.h(350): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\ja\documents\anyflyerrepo\source\camera.h(23): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\ja\documents\anyflyerrepo\source\camera.h(26): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\ja\documents\anyflyerrepo\source\camera.h(80): warning C4305: '=': truncation from 'double' to 'float'
-c:\users\ja\documents\anyflyerrepo\source\camera.h(183): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\ja\documents\anyflyerrepo\source\camera.h(190): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-  camera.cpp
-c:\users\ja\documents\anyflyerrepo\source\uavnode.h(11): warning C4305: 'initializing': truncation from 'double' to 'const float'
-c:\users\ja\documents\anyflyerrepo\source\uavnode.h(350): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\ja\documents\anyflyerrepo\source\camera.h(23): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\ja\documents\anyflyerrepo\source\camera.h(26): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\ja\documents\anyflyerrepo\source\camera.h(80): warning C4305: '=': truncation from 'double' to 'float'
-c:\users\ja\documents\anyflyerrepo\source\camera.h(183): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\ja\documents\anyflyerrepo\source\camera.h(190): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-  dictionary.cpp
-c:\users\ja\documents\anyflyerrepo\source\menulist.h(115): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-c:\users\ja\documents\anyflyerrepo\source\uavnode.h(11): warning C4305: 'initializing': truncation from 'double' to 'const float'
-c:\users\ja\documents\anyflyerrepo\source\uavnode.h(350): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\ja\documents\anyflyerrepo\source\camera.h(23): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\ja\documents\anyflyerrepo\source\camera.h(26): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\ja\documents\anyflyerrepo\source\camera.h(80): warning C4305: '=': truncation from 'double' to 'float'
-c:\users\ja\documents\anyflyerrepo\source\camera.h(183): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\ja\documents\anyflyerrepo\source\camera.h(190): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-  flightplan.cpp
-  menu.cpp
-  menulist.cpp
-c:\users\ja\documents\anyflyerrepo\source\menulist.h(115): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-  settingsmgr.cpp
-c:\users\ja\documents\anyflyerrepo\source\menulist.h(115): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-c:\users\ja\documents\anyflyerrepo\source\uavnode.h(11): warning C4305: 'initializing': truncation from 'double' to 'const float'
-c:\users\ja\documents\anyflyerrepo\source\uavnode.h(350): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\ja\documents\anyflyerrepo\source\camera.h(23): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\ja\documents\anyflyerrepo\source\camera.h(26): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\ja\documents\anyflyerrepo\source\camera.h(80): warning C4305: '=': truncation from 'double' to 'float'
-c:\users\ja\documents\anyflyerrepo\source\camera.h(183): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\ja\documents\anyflyerrepo\source\camera.h(190): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-  simeventreceiver.cpp
-c:\users\ja\documents\anyflyerrepo\source\menulist.h(115): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-c:\users\ja\documents\anyflyerrepo\source\uavnode.h(11): warning C4305: 'initializing': truncation from 'double' to 'const float'
-c:\users\ja\documents\anyflyerrepo\source\uavnode.h(350): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\ja\documents\anyflyerrepo\source\camera.h(23): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\ja\documents\anyflyerrepo\source\camera.h(26): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\ja\documents\anyflyerrepo\source\camera.h(80): warning C4305: '=': truncation from 'double' to 'float'
-c:\users\ja\documents\anyflyerrepo\source\camera.h(183): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\ja\documents\anyflyerrepo\source\camera.h(190): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
   simulation_manager.cpp
 c:\users\ja\documents\anyflyerrepo\source\menulist.h(115): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
 c:\users\ja\documents\anyflyerrepo\source\uavnode.h(11): warning C4305: 'initializing': truncation from 'double' to 'const float'
@@ -58,28 +10,14 @@ c:\users\ja\documents\anyflyerrepo\source\camera.h(183): warning C4244: '=': con
 c:\users\ja\documents\anyflyerrepo\source\camera.h(190): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 ..\source\simulation_manager.cpp(96): warning C4018: '<': signed/unsigned mismatch
 ..\source\simulation_manager.cpp(158): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-..\source\simulation_manager.cpp(612): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-..\source\simulation_manager.cpp(976): warning C4018: '<': signed/unsigned mismatch
+..\source\simulation_manager.cpp(620): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
 ..\source\simulation_manager.cpp(991): warning C4018: '<': signed/unsigned mismatch
-..\source\simulation_manager.cpp(993): warning C4244: 'argument': conversion from 'unsigned int' to 'irr::f32', possible loss of data
-..\source\simulation_manager.cpp(1055): warning C4018: '<': signed/unsigned mismatch
-  uavarray.cpp
-c:\users\ja\documents\anyflyerrepo\source\uavnode.h(11): warning C4305: 'initializing': truncation from 'double' to 'const float'
-c:\users\ja\documents\anyflyerrepo\source\uavnode.h(350): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-..\source\uavarray.cpp(36): warning C4018: '<': signed/unsigned mismatch
-..\source\uavarray.cpp(126): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-..\source\uavarray.cpp(132): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-..\source\uavarray.cpp(138): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-..\source\uavarray.cpp(141): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-..\source\uavarray.cpp(182): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-  uavnode.cpp
-c:\users\ja\documents\anyflyerrepo\source\uavnode.h(11): warning C4305: 'initializing': truncation from 'double' to 'const float'
-c:\users\ja\documents\anyflyerrepo\source\uavnode.h(350): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-..\source\uavnode.cpp(7): warning C4305: 'initializing': truncation from 'double' to 'float'
-..\source\uavnode.cpp(8): warning C4305: 'initializing': truncation from 'double' to 'float'
-..\source\uavnode.cpp(9): warning C4305: 'initializing': truncation from 'double' to 'float'
-..\source\uavnode.cpp(10): warning C4305: 'initializing': truncation from 'double' to 'float'
+..\source\simulation_manager.cpp(1006): warning C4018: '<': signed/unsigned mismatch
+..\source\simulation_manager.cpp(1008): warning C4244: 'argument': conversion from 'unsigned int' to 'irr::f32', possible loss of data
+..\source\simulation_manager.cpp(1070): warning C4018: '<': signed/unsigned mismatch
   Generating code
-  All 917 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  2 of 927 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    56 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   anyflyer-vs.vcxproj -> C:\Users\Ja\Documents\anyflyerrepo\anyflyer-vs\..\workdir\anyflyer64.exe
