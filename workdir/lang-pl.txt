@@ -1,4 +1,4 @@
-0 #nie znaleziono parametru xresolution w pliku settings.txt, przyjęto $
+0 #nie znaleziono parametru xresolution w pliku settings.txt, przyjeto $
 1 #nie znaleziono parametru yresolution w pliku settings.txt, przyjeto $
 2 #nie znaleziono parametru drivertype w pliku settings.txt, przyjeto 5 (opengl)$
 3 #nie udalo sie utworzyc oswietlenia sceny$
@@ -25,9 +25,10 @@ Strzalki : obrot kamery lub ruch w menu
 Enter : zatwierdzenie elementu menu
 S: otwarcie przepustnicy
 A: zamkniecie przepustnicy
+Z,X: ster kierunku
 Ruch myszy : drazek sterowy
-Rolka: trym steru poziomego
-Rolka myszy +Ctrl: przepustnica
+Rolka myszy: trym steru poziomego
+Rolka myszy + Ctrl: przepustnica
 H : wskaznik HUD$
 20 #nie udalo sie otworzyc pliku:$
 21 #MOC:$

@@ -1,0 +1,51 @@
+0 #parameter not found: xresolution in file settings.txt, assumed $
+1 #parameter not found: yresolution in file settings.txt, assumed $
+2 #parameter not found: drivertype in file settings.txt, assumed 5 (opengl)$
+3 #scene illumination not created$
+4 #camera animator not created$
+5 #Exit$
+6 #Plan your flight >$
+7 #Fly$
+8 #---$
+9 #---$
+10 #---$
+11 #---$
+12 #---$
+13 #Exit to Main Menu$
+14 #Choose aircraft >$
+15 #Flight plan >$
+16 #Key and control
+description >$
+17 #---$
+18 #---$
+19 #ESC : Simulation Menu
+Space,P : pause
+Tab : camera mode
+Cursors : camera rotation or movement 
+in menu
+Enter : confirmation of menu item
+S: throttle open one step
+A: throttle close one step
+Z: rudder left
+X: rudder right
+Mouse move : stick control
+Mouse roller : pitch trim
+Mouse roller + Ctrl: throttle
+H : HUD display$
+20 #file could not be opened:$
+21 #POWER:$
+22 #Menu(ESC)$
+23 #Use cursors and enter keys$
+24 #Select:$
+25 #Add aircraft >$
+26 #Remove aircraft$
+27 #Set course >$
+28 #Set altitude >$
+29 #Selected aircraft:$
+30 #, course:$
+31 #, altitude:$
+32 #Increase$
+33 #Decrease$
+34 #Pause - press space
+to turn off$
+35 #Preparing scene...$
