@@ -1,5 +1,17 @@
 # AnyFlyer
 Simple, but realistic flight simulator controlled by mouse. You can modify aerodynamics of your plane easily by script-like files.
+## Table of contents
+* [General info](#general-info)
+* [Screenshot](#screenshot)
+* [Technologies](#technologies)
+* [Features](#features)
+* [Setup](#setup)
+* [How to use](#how-to-use)
+* [File editing](#file-editing)
+* [Project status](#project-status)
+* [License](#license)
+* [Contact](#contact)
+
 ## General info
 The project was created, on the one hand: because of my passion for aviation, physics and programming. I wanted to create my own virtual world where any winged machine, defined in a few files, could fly and would be controlled by user, even without a joystick.
 
@@ -29,7 +41,7 @@ https://aka.ms/vs/15/release/vc_redist.x64.exe
 but the 2015 version should also be sufficient
 
 ## How to use
-After running .exe file, you are in Main Menu, from here you can start the simulation by choosing Fly, change the settings by Plan your flight, or exit application. When the simulation is started, you are at first in pause mode, which you can turn on/off by space key. You can always enter the Simulation Menu (either paused or unpaused) by pressing ESC. When the simulation goes on unpaused, you can operate the menu only by cursor keys/enter because mouse is used to move the stick. When pause is enabled, you can also use mouse pointer to click menu items. Full key/mouse function list you can find in: Simulation Menu/Keys and control description.
+After running .exe file, you are in Main Menu, from here you can start the simulation by choosing Fly, change the settings by Plan your flight, or exit application. When the simulation is started, you are at first in pause mode, which you can turn on/off by space key. You can always enter the Simulation Menu (either paused or unpaused) by pressing ESC. When the simulation goes unpaused, you can operate the menu only by cursor keys/enter because the mouse is used to move the stick. When pause is enabled, you can also use mouse pointer to click menu items. Full key/mouse function list you can find in: Simulation Menu/Keys and control description.
 
 In the current version of the project, you have three aircraft available (however you can modify them and add new ones).
 They are: TS-11 Iskra advanced trainer jet, powered paraglider (Paramotor) and Tomahawk missile. The most easy to fly is Iskra. When flying the Paramotor, use throttle carefully, default 75% from start will make it turn up side down and eventually stall. Controlling Tomahawk is not easy here, but I guess it would not be in reality either - mass of about 1300 kilograms and very small wings make it very prone to stall and spin. Anyway, Tomahawk is not designed to be controlled by a human with stick - the missile computer does the job.
@@ -51,7 +63,7 @@ Yet another features depend on if, and in what direction I (or maybe also other 
 ## License
 My work itself is licensed under MIT license, you can find it in LICENSE file in main repository folder.
 
-Irrlicht, a 3D graphics engine which my application uses, is licensed under zlib/libpng (which allows free use both commercial and non-commercial).
+Irrlicht, the 3D graphics engine which my application uses, is licensed under zlib/libpng (which allows free use both commercial and non-commercial).
 
 Subsequently, Irrlicht Engine is based in part on the work of the Independent JPEG Group, the zlib and libpng.
 
