@@ -801,10 +801,22 @@ inline bool SimMgr::Input()//obsługa wejścia klawiatury, true - wyjście z pę
     {
         if (pReceiver->IsKeyPressed(irr::KEY_TAB))  //przełączanie trybu kamery
         {
-          if (pCamera->GetState()==CAMERASTATE::FP)
-          {pCamera->Attach(uav,CAMERASTATE::TP);}
-          else
-          {pCamera->Attach(uav,CAMERASTATE::FP);}
+          switch (pCamera->GetState())
+          {
+          case CAMERASTATE::FP:
+            pCamera->Attach(uav,CAMERASTATE::TP);
+            break;
+          case CAMERASTATE::TP:
+            pCamera->Attach(uav,CAMERASTATE::STAND);
+            break;
+          default:
+            pCamera->Attach(uav,CAMERASTATE::FP);
+          }
+
+          //if (pCamera->GetState()==CAMERASTATE::FP)
+          //{pCamera->Attach(uav,CAMERASTATE::TP);}
+          //else
+          //{pCamera->Attach(uav,CAMERASTATE::FP);}
         }
         if (pReceiver->IsKeyPressed(irr::KEY_KEY_H)) //włączanie/wyłączanie HUD
         {
@@ -923,7 +935,7 @@ inline void SimMgr::DrawGui()
     core::dimension2d<u32> screensize=pDriver->getScreenSize();
     if (pCamera->GetSelectedUav())
     {
-        if (bHudOn)
+        if (bHudOn && pCamera->GetState()!=CAMERASTATE::STAND)
         {
             DrawHud();
         }

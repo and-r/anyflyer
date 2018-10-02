@@ -76,13 +76,22 @@ public:
             }
             else
             {
-                eSTATE=CAMERASTATE::TP;
-                fElevation=0.17453;  //10 stopni w dół
-                //fBearing=pSelectedUav->getRotation().Y*PI/180;
-                core::vector3df uavdir(0,0,1);  //wektor pokazujący północ w układzie globalnym
-                node->getAbsoluteTransformation().rotateVect(uavdir);  //teraz pokazuje kierunek przed nosem maszyny
-                fBearing=atan2(uavdir.X,uavdir.Z);
-                pIrrCamera->setUpVector(core::vector3df(0,1,0));  //w tym widoku zawsze niebo u góry, ziemia na dole
+                if (state==CAMERASTATE::TP)
+                {
+                    eSTATE=CAMERASTATE::TP;
+                    fElevation=0.17453;  //10 stopni w dół
+                    //fBearing=pSelectedUav->getRotation().Y*PI/180;
+                    core::vector3df uavdir(0,0,1);  //wektor pokazujący północ w układzie globalnym
+                    node->getAbsoluteTransformation().rotateVect(uavdir);  //teraz pokazuje kierunek przed nosem maszyny
+                    fBearing=atan2(uavdir.X,uavdir.Z);
+                    pIrrCamera->setUpVector(core::vector3df(0,1,0));  //w tym widoku zawsze niebo u góry, ziemia na dole
+                }
+                else
+                {
+                    eSTATE=CAMERASTATE::STAND;
+                    core::vector3df newpos = node->getAbsolutePosition()+node->Speed*2;
+                    pIrrCamera->setPosition(newpos);
+                }
             }
         }
     }
@@ -161,6 +170,7 @@ public:
         break;
         case CAMERASTATE::STAND:
         {
+            pIrrCamera->setTarget(pSelectedUav->getPosition());
             return core::IdentityMatrix;
         }
             break;

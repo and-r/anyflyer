@@ -47,5 +47,5 @@ H : HUD display$
 32 #Increase$
 33 #Decrease$
 34 #Pause - press space
-to turn off$
+to continue$
 35 #Preparing scene...$
