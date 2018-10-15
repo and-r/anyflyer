@@ -10,7 +10,7 @@ using namespace std;//do wykasowania
 using namespace irr;
 constexpr float PI=3.141592654;
 enum class FLIGHTSTATE{FLYING=0,LANDED=1,CRASHED=2};
-enum class COMPONENTTYPE{FUSELAGE=0,AIRFOIL=1,ENGINE=2};
+enum class COMPONENTTYPE{FUSELAGE=0,AIRFOIL=1,ENGINE=2,GEAR=3};
 using VectorIntegralFuncType = core::vector3df (*)(core::vector3df,core::vector3df,float);
 using QuaternionIntegralFuncType = core::quaternion (*)(core::vector3df,core::vector3df,float);
 
@@ -24,13 +24,24 @@ struct FoilProps
 };
 struct FuselageProps
 {
-    float fLength025;
-    float fCstream;
+    float fLength025;  //0.25 of fuselage length, at this distance from the front tip is the aerodynamic force applied
+    float fCstream;		
     float fCcyl;
 };
 struct EngineProps
 {
     float fMaxThrust;
+};
+struct GearProps
+{
+	bool bIntact = true;
+	bool bRetractable;
+	bool bDown = true;
+	float fTravel;
+	float fSpringCoef;
+	float fDampCoef;
+	float fTransferTime;
+	float fTimeToTransfer = 0;
 };
 
 struct Component
@@ -46,6 +57,7 @@ struct Component
         FoilProps FoilP;
         FuselageProps FuselageP;
         EngineProps EngineP;
+		GearProps GearP;
     };
     Component(){}  //musi być konstruktor, kompilator nie tworzy konstruktora domyślnego bo w klasie jest unia z structami/klasami i nie wie
     //której klasy/structa konstruktor wywołać
@@ -59,6 +71,7 @@ private:
     core::stringw sType;
     video::IVideoDriver* pDriver;
     scene::IMeshSceneNode* pMeshChild=nullptr;
+	scene::ISceneCollisionManager* pCollMan = nullptr;
     static VectorIntegralFuncType pVfunc;
     static QuaternionIntegralFuncType pQfunc;
     float fMass=1;  //żeby nie było zero
@@ -76,6 +89,7 @@ public:
         : scene::ISceneNode(parent, mgr, id)
     {
         pDriver=mgr->getVideoDriver();  //od scene managera pobieramy wskaźnik do karty graficznej
+		pCollMan = mgr->getSceneCollisionManager();
         pMeshChild = mgr->addMeshSceneNode(mesh,static_cast<scene::ISceneNode*>(this),id);
         //iMaterialNum=mesh->getMeshBufferCount();
         pMeshChild->setMaterialFlag(video::EMF_LIGHTING, true);  //dynamic light
@@ -468,7 +482,7 @@ protected:
 			case COMPONENTTYPE::ENGINE:
 			{
 				core::vector3df compforce(0, 0, iPower / 100.0f*pComp[i].EngineP.fMaxThrust);  //siła ciągu w układzie komponentu
-				pComp[i].Rotation.rotateVect(compforce); //teraz w układzie drona
+				pComp[i].Rotation.rotateVect(compforce); //teraz w układzie samolot
 				forcetotal += compforce;
 				momenttotal += pComp[i].Location.crossProduct(compforce);
 //                if (!(cntr%20))
@@ -476,6 +490,31 @@ protected:
 //                cout<<i<<" engine, compforce="<<compforce<<endl;
 //                cout<<i<<" comp, forcetotal="<<forcetotal<<endl<<endl;
 //                }
+				break;
+			}
+			case COMPONENTTYPE::GEAR:
+			{
+				if (pComp[i].GearP.bDown = true)
+				{
+					core::vector3df downpoint = pComp[i].Location;	//in aircraft CS
+					core::vector3df uppoint = downpoint + pComp[i].Yvector*pComp[i].GearP.fTravel;  //in aircraft CS
+					AbsoluteTransformation.rotateVect(downpoint);  //rotated to global CS
+					AbsoluteTransformation.rotateVect(uppoint);  //also rotated to global CS
+					downpoint += getPosition();		//global CS
+					uppoint += getPosition();		//global CS
+					core::line3df geartravel(downpoint, uppoint);
+					core::vector3df collisionpoint;
+					core::triangle3df triangle;
+					if (pCollMan->getSceneNodeAndCollisionPointFromRay(geartravel, collisionpoint, triangle) != nullptr)
+					{
+						core::vector3df reaction = triangle.getNormal();
+						reaction.normalize();
+						cout << i << " gear contact" << endl;
+					}
+
+				}
+
+				break;
 			}
 			}
 		}

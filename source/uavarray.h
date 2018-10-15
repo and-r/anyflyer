@@ -20,7 +20,7 @@ private:
     UavNode** pArray=nullptr;  //tablica wskaźników do dronów
 public:
     UavArray(IrrlichtDevice* device,SettingsMgr* sett,Dictionary* dict):pDevice(device),pSett(sett),pDict(dict)  //konstuktor parametryczny - jedyny
-    { }
+    {}
     ~UavArray()
     {
         DeleteAll();

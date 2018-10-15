@@ -77,7 +77,7 @@ UavNode* UavArray::Add(int type=0, COURSE course, float alt)
 //        pArray[iNum]->RotSpeed=core::vector3df(0,0,0);   //w radianach
         pArray[iNum]->updateAbsolutePosition();
         ++iNum;  //licznik maszyn powiększa się o 1
-        return pArray[iNum-1];  //metoda zwraca wskaźnik do właśnie utworzonego drona
+        return pArray[iNum-1];  //metoda zwraca wskaźnik do właśnie utworzonej maszyny
     }
     return nullptr;
 }
@@ -90,7 +90,7 @@ void UavArray::LoadData(UavNode* uav)
 
     }
 
-    //przypisywanie właściwości całego drona
+    //przypisywanie właściwości całej maszyny
     uav->sType = sett.getVar<string>("type").c_str();
 
     uav->fMass=sett.getVar<float>("mass");
@@ -180,7 +180,20 @@ void UavArray::LoadData(UavNode* uav)
                 varname=to_string(i)+"maxthrust";
                 float maxthrust = sett.getVar<float>(varname);
                 uav->pComp[i].EngineP.fMaxThrust=maxthrust/(1.225/2);  //po pomnożeniu przez ro w funkcji Reaction, wartość będzie ok
+				break;
             }
+		case COMPONENTTYPE::GEAR:
+		    {
+				varname = to_string(i) + "retractable";
+				uav->pComp[i].GearP.bRetractable = static_cast<bool>(sett.getVar<int>(varname));
+				varname = to_string(i) + "travel";
+				uav->pComp[i].GearP.fTravel = sett.getVar<float>(varname);
+				varname = to_string(i) + "springcoef";
+				uav->pComp[i].GearP.fSpringCoef = sett.getVar<float>(varname);
+				varname = to_string(i) + "dampcoef";
+				uav->pComp[i].GearP.fDampCoef = sett.getVar<float>(varname);
+				break;
+		    }
         }
 
 

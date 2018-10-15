@@ -66,9 +66,9 @@ void SimMgr::Begin()
 	pDevice->setResizable(true);
     //jesli juz mamy device, przypisujemy wskazniki simulation_managera, dotyczace obiektow IrrlichDevice
     pScene=pDevice->getSceneManager();
+	pCollMan = pScene->getSceneCollisionManager();
     pUavArr=new UavArray(pDevice,pSett,pDict);
     pDriver=pDevice->getVideoDriver();
-    pCollMan=pScene->getSceneCollisionManager();
 }
 void SimMgr::BeginScene()
 {

@@ -1,24 +1,24 @@
 (type) {paramotor}
-(mass) {110}                 masa w kilogramach
-(cog) {0,0,0}             srodek masy w metrach
-(mominert) {460,66,530}   momenty bezwladnosci: xx, yy, zz, w kg*m^2
-(controlderiv) {1.5}           pochodna wspolczynnika powierzchni sterowej
-(fppcampos) {0,1,1}          polozenie kamery fpp
-(defaultspeed) {5}         domyslna predkosc-poczatkowa,m/s
-(compnum) {5}                liczba komponent?w        
+(mass) {110}                 mass in kilograms
+(cog) {0,0,0}             center of mass in meters
+(mominert) {460,66,530}   moments of inertia: xx, yy, zz, unit: kg*m^2
+(controlderiv) {1.5}          derivative of control surface coefficient
+(fppcampos) {0,1,1}          position of fpp camera
+(defaultspeed) {5}         default initial speed, m/s
+(compnum) {8}                number of components      
 
-(0comptype) {1}           1-plat, centroplat
+(0comptype) {1}           1-airfoil, mid-wing
 (0location) {0,7.4,0}      m
 (0rotation) {7,0,0}       deg
 (0size) {14.2}               m^2
-(0chartid) {0}            id charakterystyki
+(0chartid) {0}            id of characteristics
 (0ar) {3.9}                 aspect ratio
-(0controlsize) {0}            powierzchnia steru/powierzchnia plata
+(0controlsize) {0}            control surface area/airfoil area
 (0controlangleup) {0}           max angle up, deg
 (0controlangledown) {0}
 (0controlsensit) {0,0,0}        elevator sensitivity,rudder sens.,aileron sens.
 
-(1comptype) {1}           czesc prawa
+(1comptype) {1}           right part
 (1location) {3.7,6.3,-0.3}
 (1rotation) {4,0,-46}
 (1size) {5}
@@ -29,7 +29,7 @@
 (1chartid) {0}
 (1ar) {3.9}
 
-(2comptype) {1}            czesc lewa
+(2comptype) {1}            left part
 (2location) {-3.7,6.3,-0.3}
 (2rotation) {4,0,46}
 (2size) {5}
@@ -40,20 +40,44 @@
 (2chartid) {0}
 (2ar) {3.9}
 
-(3comptype) {0}            0-kadlub
+(3comptype) {0}            0-fuselage
 (3location) {0,0,0}
 (3rotation) {0,0,0}
 (3length) {2}
 (3diameter) {2}
-(3cdcross) {0.5}   wspolczynnik oporu dla przekroju poprzecznego kadluba, odniesiony do maks.szerokosci kadluba razy dlugosc jednostkowa, 0.5 jest dla walca
+(3cdcross) {0.5}        drag coefficient for cross-section of fuselage, related to max width of that fuselage times unit length, 0.5 is for cylinder
 
-(4comptype) {2}            2-silnik
-(4location) {0,0,-0,3}
+(4comptype) {2}            2-engine
+(4location) {0,0,-0.3}
 (4rotation) {0,0,0}
-(4maxthrust) {530}       maksymalny ciag w niutonach, stand.atm. na poziomie morza
+(4maxthrust) {530}       max thrust in Newtons, stand.atm. at sea level
 
-(0c0) {0,0.25,-0.04}  charakterystyka nr0,kat0 stopni,y:CL,z:CD
-(0c1) {0,1.2,-0.08} charakterystyka nr 0, kat 10 stopni
+(5comptype) {3}		3-landing gear, right foot
+(5retractable) {0}	0-no, 1-yes
+(5location) {4,-10,5}
+(5rotation) {0,0,0}
+(5travel)   {5}
+(5springcoef) {2000}	N/m
+(5dampcoef)   {0}	N/(m*s)
+
+(6comptype) {3}		3-landing gear, left foot
+(6retractable) {0}
+(6location) {-4,-10,5}
+(6rotation) {0,0,0}
+(6travel)   {5}
+(6springcoef) {2000}	N/m
+(6dampcoef)   {0}	N/(m*s)
+
+(7comptype) {3}		3-landing gear, tail?
+(7retractable) {0}
+(7location) {0,-10,-5}
+(7rotation) {0,0,0}
+(7travel)   {5}
+(7springcoef) {2000}	N/m
+(7dampcoef)   {0}	N/(m*s)
+
+(0c0) {0,0.25,-0.04}  characteristics no 0,angle 0 deg,x:not used,y:CL,z:CD
+(0c1) {0,1.2,-0.08} characteristics no 0, angle 10 deg
 (0c2) {0,1,2,-0.2}
 (0c3) {0,0.9,-0.6}
 (0c4) {0,1.05,-0.9}
