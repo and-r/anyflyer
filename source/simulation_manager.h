@@ -46,7 +46,7 @@ private:
 	wchar_t* cVersion = L"0.2.0";
     bool bPause = false;  //tymczasowo
     bool bHudOn = true;
-    bool bControlled = true;  //czy dron jest kontrolowany (ten który jest śledzony przez kamerę)
+    bool bControlled = true;  //czy maszyna jest kontrolowana (ta która jest śledzona przez kamerę)
     core::matrix4 CamRotMatrix;
     video::SColor HudColor;
 	video::SColor SkyColor;
@@ -56,6 +56,8 @@ private:
     float fRollInput=0;
     float fPitchInput=0;
     float fYawInput=0;
+	float fBrakeRightInput = 0;
+	float fBrakeLeftInput = 0;
     int iTrimStep = 1;
     int iMouseSpeed;
     int iMouseReturnSpeed;

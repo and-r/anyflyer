@@ -30,6 +30,16 @@
 
 (ni) {1.48e-5}                  kinematic viscosity of air
 
+(rollcoefrough) {0.1}		rolling resistance coefficient, rough terrain
+
+(rollcoefconcrete) {0.02}	rolling resistance coefficient, concrete
+
+(gripcoefrough)	{0.3}		grip coefficient, rough terrain
+
+(gripcoefconcrete) {0.5}        grip coefficient, concrete
+
+(gripspeed) {0.1}			speed above which there is full grip coefficient, m/s
+
 (vintegralfunc) {1}             0:Euler's integration, 1:trapese
 
 (qintegralfunc) {1}             0:Euler's integration, 1:trapese

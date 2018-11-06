@@ -8,6 +8,11 @@ float UavNode::fGaccel = 9.81;  //przyspieszenie ziemskie w m/s^2
 float UavNode::fRozero = 1.225;  //gestosc powietrza na poziomie 0, kg/m^3
 float UavNode::fTzero = 288.16;  //temperatura powietrza na posiomie 0, K
 float UavNode::fNi = 1.48e-5;   //lepkość kinematyczna powietrza
+float UavNode::fRollcoefrough = 0.1;	//rolling resistance coefficient, rough terrain
+float UavNode::fRollcoefconcrete = 0.02;		//rolling resistance coefficient, concrete
+float UavNode::fGripcoefrough = 0.25;		//grip coefficient, rough terrain
+float UavNode::fGripcoefconcrete = 0.5;		//grip coefficient, concrete
+float UavNode::fGripspeed = 1;	//speed above which there is full grip coefficient, m/s
 VectorIntegralFuncType UavNode::pVfunc=nullptr;
 QuaternionIntegralFuncType UavNode::pQfunc=nullptr;
 

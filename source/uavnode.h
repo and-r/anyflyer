@@ -34,14 +34,17 @@ struct EngineProps
 };
 struct GearProps
 {
-	bool bIntact = true;
-	bool bRetractable;
-	bool bDown = true;
-	float fTravel;
-	float fSpringCoef;
-	float fDampCoef;
-	float fTransferTime;
-	float fTimeToTransfer = 0;
+	bool bIntact;		//current status intact/damaged
+	bool bRetractable;		//loaded from file	
+	bool bDown;			//current position up/down
+	bool bSwivel;		//loaded from file, is the wheel self aligning
+	bool bBraked;		//loaded from file
+	float fDeflection;  //deflection at current frame
+	float fTravel;			//loaded from file,	maximum deflection that the gear withstands
+	float fSpringCoef;	//loaded from file	
+	float fDampCoef;	//loaded from file	
+	float fTransferTime;	//loaded from file	
+	float fTimeToTransfer;	//time to complete current operation of retracting or extending
 };
 
 struct Component
@@ -75,12 +78,14 @@ private:
     static VectorIntegralFuncType pVfunc;
     static QuaternionIntegralFuncType pQfunc;
     float fMass=1;  //żeby nie było zero
-    core::vector3df Cog{};  //środek masy, w układzie lokalnym drona
+    core::vector3df Cog{};  //środek masy, w układzie lokalnym maszyny
     core::vector3df MomInert{};  //momenty bezwładności
     int iCompNum;  //liczba komponentow
-    Component* pComp=nullptr;  //wskaźnik do tablicy dynamicznej komponentów
+	Component* pComp = nullptr;  //wskaźnik do tablicy dynamicznej komponentów
     core::vector3df FPPCamPos{};  //pozycja kamery FPP względem punktu 0 UavNode
     core::vector3df ControlSignals{};  //aktualne wychylenia powierzchni sterowych
+	float fBrakeRightSignal{};
+	float fBrakeLeftSignal{};
     int iPower = 75;  //aktualna moc silnika
     int iPitchTrim = 0;
 
@@ -106,6 +111,11 @@ public:
     static float fRozero;   //gęstość powietrza na wysokości zero
     static float fTzero;    //temperatura na wysokości 0
     static float fNi;   //lepkość kinematyczna
+	static float fRollcoefrough;	//rolling resistance coefficient, rough terrain
+	static float fRollcoefconcrete;		//rolling resistance coefficient, concrete
+	static float fGripcoefrough;		//grip coefficient, rough terrain
+	static float fGripcoefconcrete;		//grip coefficient, concrete
+	static float fGripspeed;	//speed above which there is full grip coefficient, m/s
     friend class UavArray;
     FLIGHTSTATE eSTATE=FLIGHTSTATE::FLYING;
     core::vector3df Speed{};
@@ -182,6 +192,24 @@ public:
         }
 
     }
+	virtual void SetOtherSignals(const float brakeright, const float brakeleft)
+	{
+		fBrakeRightSignal = brakeright;
+		fBrakeLeftSignal = brakeleft;
+		if (brakeright > 1)
+		{
+			fBrakeRightSignal = 1;
+		}
+		if (brakeleft > 1)
+		{
+			fBrakeLeftSignal = 1;
+		}
+	}
+	virtual void GetOtherSignals(float& brakeright,float& brakeleft)
+	{
+		brakeright = fBrakeRightSignal;
+		brakeleft = fBrakeLeftSignal;
+	}
     virtual void AddPitchTrim(int incrementpitch)
     {
         iPitchTrim+=incrementpitch;
@@ -270,21 +298,17 @@ public:
         q.fromAngleAxis(anglerad,rotvm1);
         return q;
     }
-	core::vector3df Move(unsigned deltatime, core::vector3df wind)
+	core::vector3df Move(float deltaseconds, core::vector3df wind)
 	{
 		//    static int cntr=0;//tymczasowo!!!
-
-		float deltaseconds = deltatime / 1000.0f;  //czas w sekundach
 
 												   //najpierw wartości liniowe
 		core::vector3df oldspeed = Speed;  //zapisanie poprzedniej wartości
 		core::vector3df forcetotal{};  //wektor główny siły, wyzerowany
 		core::vector3df momenttotal{};  //moment główny, wyzerowany
 
-		Reaction(forcetotal, momenttotal, wind);  //otrzymujemy wektor główny siły i mom. główny w układzie drona
-												  //    cout<<"forcetotal,drone cs:"<<forcetotal<<endl;
-												  //    core::matrix4 M=getAbsoluteTransformation();
-												  //    M.rotateVect(forcetotal);
+		Reaction(deltaseconds, forcetotal, momenttotal, wind);  //otrzymujemy wektor główny siły i mom. główny w układzie samolot
+											
 		AbsoluteTransformation.rotateVect(forcetotal);  //teraz forcetotal jest w układzie globalnym
         core::vector3df acceltotal = (forcetotal / fMass) + core::vector3df(0, -fGaccel, 0);  //suma przyśpieszeń działająca na samolot
 																							  //core::vector3df acceltotal=(core::vector3df(0,0,0)/fMass)+core::vector3df(0,-fGaccel,0);  //suma przyśpieszeń działająca na dron
@@ -332,9 +356,14 @@ public:
 		return getPosition();
 	}
 protected:
-	void Reaction(core::vector3df& forcetotal, core::vector3df& momenttotal, const core::vector3df& wind)
+	void Reaction(float deltaseconds, core::vector3df& forcetotal, core::vector3df& momenttotal, const core::vector3df& wind)
 	{
-        //static int cntr{};  //tylko do sprawdzania!!!
+        static int cntr{};  //tylko do sprawdzania!!!
+		/*if (!(cntr % 20))
+		   {
+		        cout<<"brake right= "<<fBrakeRightSignal<<endl;
+				cout << "brake left= " << fBrakeLeftSignal << endl << endl;
+		   }*/
 		int alt = int(getPosition().Y);
 		static int lastalt = alt;
 		static float ro = fRozero*pow((fTzero - 0.0065f*alt) / fTzero, 4.2561f);  //obliczenie gęstości powietrza
@@ -352,7 +381,7 @@ protected:
 			{
 			case COMPONENTTYPE::FUSELAGE:
 			{
-                core::vector3df compairspeed = (RotSpeed.crossProduct(pComp[i].Location)) + uavairspeed;  //obliczenie predkosci w kadlubie - ukl aircraft
+                core::vector3df compairspeed = (RotSpeed.crossProduct(pComp[i].Location)) + uavairspeed;  //airspeed at fuselage - aircraft CS
                 core::vector3df airspeedcomp(pComp[i].Xvector.dotProduct(compairspeed),pComp[i].Yvector.dotProduct(compairspeed),
                                              pComp[i].Zvector.dotProduct(compairspeed));  //airspeed at component, component CS
                 core::vector3df airspeedcompXY(airspeedcomp.X,airspeedcomp.Y,0);  //projection of airspeedcomp to XY plane
@@ -507,11 +536,108 @@ protected:
 					core::triangle3df triangle;
 					if (pCollMan->getSceneNodeAndCollisionPointFromRay(geartravel, collisionpoint, triangle) != nullptr)
 					{
-						core::vector3df reaction = triangle.getNormal();
-						reaction.normalize();
-						cout << i << " gear contact" << endl;
-					}
+						core::vector3df compairspeed = (RotSpeed.crossProduct(pComp[i].Location)) + uavairspeed;  //airspeed at wheel - aircraft CS
 
+						//calculation of force normal to ground-------------------------------
+						core::vector3df trianglenormal = triangle.getNormal();
+						trianglenormal.normalize();	//unit vector in global CS
+						AbsoluteTransformation.inverseRotateVect(trianglenormal);  //unit vector in aircraft CS
+
+						core::vector3df compforce = trianglenormal;
+						float deflection = (downpoint - collisionpoint).getLength();
+						float deflecspeed = (deflection - pComp[i].GearP.fDeflection)/deltaseconds;	//(current deflection - past deflection) * deltatime
+						//cout << i << " defl_m1:" << pComp[i].GearP.fDeflection << " defl_0:" << deflection << " deltasec:" << deltaseconds << endl;
+						pComp[i].GearP.fDeflection = deflection;	//refreshing for a new frame
+						compforce *= (deflection * pComp[i].GearP.fSpringCoef)+(deflecspeed*pComp[i].GearP.fDampCoef);	//normal force = spring force + damper force
+
+						if (pComp[i].GearP.bSwivel == true)  //self-aligning wheel
+						{
+							//calculation of wheel's longitudinal force (from roll friction and braking)
+							core::vector3df xdir = compairspeed.crossProduct(trianglenormal);  //vector along aligned's wheel axis, in plane of ground surface
+							xdir.normalize();
+							core::vector3df rollresist = xdir.crossProduct(trianglenormal);   //vector along wheel's speed, in plane of ground surface
+							rollresist.normalize();
+							float brakecoef = 0;
+							if (pComp[i].GearP.bBraked == 1)
+							{
+								if ((pComp[i].Location.X > 0) && (fBrakeRightSignal > 0))
+								{
+									brakecoef = fGripcoefrough * fBrakeRightSignal;
+								}
+								if ((pComp[i].Location.X < 0) && (fBrakeLeftSignal > 0))
+								{
+									brakecoef = fGripcoefrough * fBrakeLeftSignal;
+								}
+							}
+							rollresist *= compforce.getLength() * (fRollcoefrough * (1 + compairspeed.getLength() * 0.05)+brakecoef);
+							/*if (!(cntr % 20))
+							{
+								cout << i << " rollresist: " << rollresist << " compairspeed: "<<compairspeed.getLength()<<endl;
+								cout << i << " compforce: " << compforce << endl << endl;
+							}*/
+							compforce += rollresist;
+
+						}
+						else   //fixed wheel
+						{
+							//calculation of wheel side force-------------------------------------
+							float sidespeed = pComp[i].Xvector.dotProduct(compairspeed);
+							float realgripcoef = (abs(sidespeed) > fGripspeed ? fGripcoefrough : fGripcoefrough * (abs(sidespeed) / fGripspeed));		//whether to take full grip coef, or only fraction for low slip speed
+							if (sidespeed < 0) { realgripcoef *= -1; }
+							core::vector3df sideforce = pComp[i].Zvector.crossProduct(trianglenormal);
+							sideforce.normalize();
+							sideforce *= realgripcoef * compforce.getLength();
+							compforce += sideforce;  //includes horizontal force along wheel's axis
+
+							//calculation of wheel's longitudinal force (from roll friction and braking)
+							core::vector3df frontspeed = pComp[i].Zvector * pComp[i].Zvector.dotProduct(compairspeed);
+							core::vector3df frontspeednormalized = - frontspeed;
+							frontspeednormalized.normalize();
+							float brakecoef = 0;
+							if (pComp[i].GearP.bBraked == 1)
+							{
+								if ((pComp[i].Location.X > 0) && (fBrakeRightSignal > 0))
+								{
+									brakecoef = fGripcoefrough * fBrakeRightSignal;
+								}
+								if ((pComp[i].Location.X < 0) && (fBrakeLeftSignal > 0))
+								{
+									brakecoef = fGripcoefrough * fBrakeLeftSignal;
+								}
+							}
+							core::vector3df rollresist = frontspeednormalized * compforce.getLength() * (fRollcoefrough*(1 + frontspeed.getLength() * 0.05)+brakecoef);
+
+							/*if (!(cntr % 20))
+							{
+								cout << i << " rollresist: " << rollresist << " frontspeed: "<<frontspeed.getLength()<<endl;
+								cout << i << " compforce: " << compforce << endl << endl;
+							}*/
+
+							compforce += rollresist;
+							//front *= compforce.getLength();
+						}
+						/*if (!(cntr % 20))
+						{
+							cout << i << " realgripcoefficien: " << realgripcoef << endl;
+							cout << i << " Zvector: " << pComp[i].Zvector << endl;
+							cout << i << " trianglenormal: " << trianglenormal << endl;
+							cout << i << " sideforce: " << sideforce << endl<<endl;
+						}*/
+						//core::vector3df airspeedcomp(pComp[i].Xvector.dotProduct(compairspeed), pComp[i].Yvector.dotProduct(compairspeed),
+							//pComp[i].Zvector.dotProduct(compairspeed));  //airspeed at component, component CS
+
+						
+						//cout << i << " damper force: " << (deflecspeed*pComp[i].GearP.fDampCoef) << endl;
+						//cout << i << " spring force: " << (deflection * pComp[i].GearP.fSpringCoef) << endl<<endl;
+						compforce /= ro; //to avoid influence of air density (later, compforce will be multiplied by ro)
+						forcetotal += compforce;
+						momenttotal += pComp[i].Location.crossProduct(compforce);
+						
+					}
+					else
+					{
+						pComp[i].GearP.fDeflection = 0;
+					}
 				}
 
 				break;
@@ -529,7 +655,7 @@ protected:
              //cout<<"cntr = "<<cntr<<endl<<endl;
         //}
 
-       //++cntr;
+       ++cntr;
 	}
 };
 

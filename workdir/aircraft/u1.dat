@@ -54,27 +54,33 @@
 
 (5comptype) {3}		3-landing gear, right foot
 (5retractable) {0}	0-no, 1-yes
-(5location) {4,-10,5}
+(5swivel)      {1}
+(5braked)      {1}
+(5location) {0.4,-1,0.5}
 (5rotation) {0,0,0}
-(5travel)   {5}
-(5springcoef) {2000}	N/m
-(5dampcoef)   {0}	N/(m*s)
+(5travel)   {1}
+(5springcoef) {4000}	N/m
+(5dampcoef)   {200}	N/(m*s)
 
 (6comptype) {3}		3-landing gear, left foot
 (6retractable) {0}
-(6location) {-4,-10,5}
+(6swivel)      {1}
+(6braked)      {1}
+(6location) {-0.4,-1,0.5}
 (6rotation) {0,0,0}
-(6travel)   {5}
-(6springcoef) {2000}	N/m
-(6dampcoef)   {0}	N/(m*s)
+(6travel)   {1}
+(6springcoef) {4000}	N/m
+(6dampcoef)   {200}	N/(m*s)
 
 (7comptype) {3}		3-landing gear, tail?
 (7retractable) {0}
-(7location) {0,-10,-5}
+(7swivel)      {1}
+(7braked)      {1}
+(7location) {0,-1,-0.5}
 (7rotation) {0,0,0}
-(7travel)   {5}
-(7springcoef) {2000}	N/m
-(7dampcoef)   {0}	N/(m*s)
+(7travel)   {1}
+(7springcoef) {6000}	N/m
+(7dampcoef)   {300}	N/(m*s)
 
 (0c0) {0,0.25,-0.04}  characteristics no 0,angle 0 deg,x:not used,y:CL,z:CD
 (0c1) {0,1.2,-0.08} characteristics no 0, angle 10 deg

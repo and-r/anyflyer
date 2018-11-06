@@ -186,12 +186,21 @@ void UavArray::LoadData(UavNode* uav)
 		    {
 				varname = to_string(i) + "retractable";
 				uav->pComp[i].GearP.bRetractable = static_cast<bool>(sett.getVar<int>(varname));
+				varname = to_string(i) + "swivel";
+				uav->pComp[i].GearP.bSwivel = static_cast<bool>(sett.getVar<int>(varname));
+				varname = to_string(i) + "braked";
+				uav->pComp[i].GearP.bBraked = static_cast<bool>(sett.getVar<int>(varname));
 				varname = to_string(i) + "travel";
 				uav->pComp[i].GearP.fTravel = sett.getVar<float>(varname);
 				varname = to_string(i) + "springcoef";
 				uav->pComp[i].GearP.fSpringCoef = sett.getVar<float>(varname);
 				varname = to_string(i) + "dampcoef";
 				uav->pComp[i].GearP.fDampCoef = sett.getVar<float>(varname);
+				//setting initial values for other parameters
+				uav->pComp[i].GearP.bDown = true;
+				uav->pComp[i].GearP.bIntact = true;
+				uav->pComp[i].GearP.fDeflection = 0;
+				uav->pComp[i].GearP.fTimeToTransfer = 0;
 				break;
 		    }
         }

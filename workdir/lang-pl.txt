@@ -26,6 +26,8 @@ Enter : zatwierdzenie elementu menu
 S: otwarcie przepustnicy
 A: zamkniecie przepustnicy
 Z,X: ster kierunku
+C,V: lewy/prawy hamulec kol
+B: oba hamulce kol
 Ruch myszy : drazek sterowy
 Rolka myszy: trym steru poziomego
 Rolka myszy + Ctrl: przepustnica
@@ -47,3 +49,4 @@ H : wskaznik HUD$
 34 #Pauza - nacisnij
 spacje aby wylaczyc$
 35 #Przygotowywanie sceny...$
+36 #HAMULCE$

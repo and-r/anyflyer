@@ -159,6 +159,18 @@ void SimMgr::BeginScene()
         UavNode::fTzero = pSett->getVar<float>("tzero");
         UavNode::fNi = pSett->getVar<float>("ni");
 
+		//cout << "przed" << endl;
+		//int a;
+		//cin >> a;
+
+	//values and coefficient related to landing gear (wheels)
+		UavNode::fRollcoefrough = pSett->getVar<float>("rollcoefrough");
+		UavNode::fRollcoefconcrete = pSett->getVar<float>("rollcoefconcrete");
+		UavNode::fGripcoefrough = pSett->getVar<float>("gripcoefrough");
+		UavNode::fGripcoefconcrete = pSett->getVar<float>("gripcoefconcrete");
+		UavNode::fGripspeed = pSett->getVar<float>("gripspeed");
+		
+
     //ustawiamy wskaźniki do funkcji całkowania dla UavNode
     switch (pSett->getVar<int>("vintegralfunc"))
     {
@@ -911,10 +923,56 @@ inline bool SimMgr::Input()//obsługa wejścia klawiatury, true - wyjście z pę
             }
             fYawInput-=fYawInput*int(uFrameDeltaTime)*iMouseReturnSpeed/4000.0f;  //powrót do położenia 0
 
-            //teraz trzeba parametry przekazać dronowi
+			//calculation of input signals for wheel brakes
+			// substraction from brake signals
+			if (fBrakeRightInput > 0)
+			{
+				fBrakeRightInput -= int(uFrameDeltaTime)*iMouseSpeed / 4000.0f;
+			}
+			if (fBrakeLeftInput > 0)
+			{
+				fBrakeLeftInput -= int(uFrameDeltaTime)*iMouseSpeed / 4000.0f;
+			}
+			//addition to brake signals
+			if (pReceiver->IsKeyDown(irr::KEY_KEY_B))  //both brakes symmetrically
+			{
+				if (fBrakeRightInput > fBrakeLeftInput)
+				{
+					fBrakeLeftInput += int(uFrameDeltaTime)*iMouseSpeed / 1200.0f;
+					fBrakeLeftInput = (fBrakeRightInput < fBrakeLeftInput ? fBrakeRightInput : fBrakeLeftInput);
+				}
+				else
+				{
+					if (fBrakeRightInput < fBrakeLeftInput)
+					{
+						fBrakeRightInput += int(uFrameDeltaTime)*iMouseSpeed / 1200.0f;
+						fBrakeRightInput = (fBrakeRightInput > fBrakeLeftInput ? fBrakeLeftInput : fBrakeRightInput);
+					}
+					else
+					{
+						fBrakeRightInput += int(uFrameDeltaTime)*iMouseSpeed / 1200.0f;
+						fBrakeLeftInput += int(uFrameDeltaTime)*iMouseSpeed / 1200.0f;
+					}
+				}
+			}
+			if (pReceiver->IsKeyDown(irr::KEY_KEY_V))  //only right brake
+			{
+				fBrakeRightInput += int(uFrameDeltaTime)*iMouseSpeed / 1200.0f;
+			}
+			if (pReceiver->IsKeyDown(irr::KEY_KEY_C))  //only left brake
+			{
+				fBrakeLeftInput += int(uFrameDeltaTime)*iMouseSpeed / 1200.0f;
+			}
+			//cut to 1 if any signal exceeds this value
+			if (fBrakeRightInput > 1)
+			{fBrakeRightInput = 1;}
+
+			if (fBrakeLeftInput > 1)
+			{fBrakeLeftInput = 1;}
+
+            //now let's send all the signals to the aircraft
             uav->setControlSignals(core::vector3df((fPitchInput),fYawInput,fRollInput));
-
-
+			uav->SetOtherSignals(fBrakeRightInput, fBrakeLeftInput);
         }
     }
     //ustawienie sygnałów sterujacych dla maszyn aktualnie nie sterowanych przez użytkownika (tylko trym)
@@ -961,6 +1019,21 @@ inline void SimMgr::DrawGui()
            powertext+=L"%";
            core::rect<s32> powerrect(stickpixel.X-40,stickpixel.Y-70,stickpixel.X+40,stickpixel.Y-50);
            pFont1->draw(powertext,powerrect,HudColor,true,true);
+		   //force applied to brakes - only if there is any
+		   if (fBrakeRightInput > 0 || fBrakeLeftInput > 0)
+		   {
+			   core::stringw braketext = pDict->get(36).c_str();
+			   core::rect<s32> brakerect(stickpixel.X - 120, stickpixel.Y - 70, stickpixel.X - 40, stickpixel.Y - 50);
+			   pFont1->draw(braketext, brakerect, HudColor, true, true);
+			   float brakeright, brakeleft;
+			   pCamera->GetSelectedUav()->GetOtherSignals(brakeright, brakeleft);
+			   int ibrakeright = int(brakeright * 80);
+			   int ibrakeleft = int(brakeleft * 80);
+			   pDriver->draw2DLine(core::vector2di(stickpixel.X - 120, stickpixel.Y + 40 - ibrakeleft),
+				   core::vector2di(stickpixel.X - 80, stickpixel.Y + 40 - ibrakeleft),HudColor);
+			   pDriver->draw2DLine(core::vector2di(stickpixel.X - 80, stickpixel.Y + 40 - ibrakeright),
+				   core::vector2di(stickpixel.X - 40, stickpixel.Y + 40 - ibrakeright),HudColor);
+		   }
         }
     }
     if (pSimMenuList->bVisible)
@@ -1068,7 +1141,7 @@ inline void SimMgr::DrawHud()
     pFont1->draw(headingstring,headrect,HudColor,true,true);
 }
 
-void SimMgr::Fly()noexcept  //it consists of simulation loop - to speed up, it is noexcept
+void SimMgr::Fly()noexcept  //contains simulation loop - to speed up, it is noexcept
 {
 
     UavNode** uavarray = pUavArr->getArray();
@@ -1112,7 +1185,8 @@ void SimMgr::Fly()noexcept  //it consists of simulation loop - to speed up, it i
                 {
                     uavarray[i]->updateAbsolutePosition();  //być moze mozna to usunąć
                     core::vector3df prevpos(uavarray[i]->getPosition());
-                    core::vector3df currpos(uavarray[i]->Move(uFrameDeltaTime,core::vector3df(0,0,0)));
+					float deltaseconds = uFrameDeltaTime / 1000.0f;  //czas w sekundach
+                    core::vector3df currpos(uavarray[i]->Move(deltaseconds,core::vector3df(0,0,0)));
                     //sprawdzamy zderzenie
                     core::line3df way(prevpos,currpos);
                     core::vector3df collisionpoint;

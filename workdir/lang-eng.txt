@@ -26,8 +26,9 @@ in menu
 Enter : confirmation of menu item
 S: throttle open one step
 A: throttle close one step
-Z: rudder left
-X: rudder right
+Z,X: rudder left/right
+C,V: left/right wheel brake
+B: both wheel brakes
 Mouse move : stick control
 Mouse roller : pitch trim
 Mouse roller + Ctrl: throttle
@@ -49,3 +50,4 @@ H : HUD display$
 34 #Pause - press space
 to continue$
 35 #Preparing scene...$
+36 #BRAKES$

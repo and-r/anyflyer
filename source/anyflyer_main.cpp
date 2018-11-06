@@ -21,7 +21,7 @@ void closeall(int status)
         {
             cout<<"EXIT_FAILURE"<<endl;
 #ifdef _IRR_WINDOWS_
-			//system("pause");
+			system("pause");
 #endif
             exit(EXIT_FAILURE);
         }
