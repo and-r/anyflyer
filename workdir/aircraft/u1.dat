@@ -2,7 +2,7 @@
 (mass) {110}                 mass in kilograms
 (cog) {0,0,0}             center of mass in meters
 (mominert) {460,66,530}   moments of inertia: xx, yy, zz, unit: kg*m^2
-(controlderiv) {1.5}          derivative of control surface coefficient
+(controlderiv) {1.25}          derivative of control surface coefficient
 (fppcampos) {0,1,1}          position of fpp camera
 (defaultspeed) {5}         default initial speed, m/s
 (compnum) {8}                number of components      
@@ -24,7 +24,7 @@
 (1size) {5}
 (1controlsize) {0.1}
 (1controlangleup) {0}
-(1controlangledown) {80}
+(1controlangledown) {50}
 (1controlsensit) {-1,0,-1}
 (1chartid) {0}
 (1ar) {3.9}
@@ -35,7 +35,7 @@
 (2size) {5}
 (2controlsize) {0.1}
 (2controlangleup) {0}
-(2controlangledown) {80}
+(2controlangledown) {50}
 (2controlsensit) {-1,0,1}
 (2chartid) {0}
 (2ar) {3.9}

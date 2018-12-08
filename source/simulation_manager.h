@@ -84,7 +84,7 @@ private:
 //    pDriver->draw2DLine(start,end,HudColor);  //rysuje linie
     core::dimension2di MenuPos=core::dimension2di(30,60);
     core::dimension2di PromptPos = core::dimension2di(30,10);
-    core::dimension2di InfotextPos = core::dimension2di(-200,10);//od prawej krawedzi ekranu!
+    core::dimension2di InfotextPos = core::dimension2di(-400,10);//od prawej krawedzi ekranu!
 
     int iWsign[14]={-14,0,-6,0,-3,5,0,0,3,5,6,0,14,0};  //punkty znaku "waterline"
     core::vector2di Wsign[7];  //punkty znaku "waterline"
@@ -97,7 +97,7 @@ private:
     void LoadPlan(int);
     void ResetPlan();
     core::stringw getFlightPlan();
-
+	core::stringw getFlapsAndGearText(UavNode* uav);
 public:
 static SimMgr* pSimMgr;
     ~SimMgr();//destruktor

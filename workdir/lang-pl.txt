@@ -50,3 +50,10 @@ H : wskaznik HUD$
 spacje aby wylaczyc$
 35 #Przygotowywanie sceny...$
 36 #HAMULCE$
+37 #Klapy:$
+38 #przestawianie...$
+39 #start$
+40 #posrednie$
+41 #ladowanie$
+42 #Podwozie:$
+43 #wysuniete$

@@ -51,3 +51,10 @@ H : HUD display$
 to continue$
 35 #Preparing scene...$
 36 #BRAKES$
+37 #Flaps:$
+38 #shifting...$
+39 #take off$
+40 #intermediate$
+41 #landing$
+42 #Undercarriage:$
+43 #down$

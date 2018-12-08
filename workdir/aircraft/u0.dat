@@ -2,12 +2,13 @@
 (mass) {3000}                 mass in kilograms
 (cog) {0,0,0}             	center of mass
 (mominert) {48000,60000,12000}   moments of intertia: xx, yy, zz, w kg*m^2
-(controlderiv) {2}           derivative of control surface coefficient
+(controlderiv) {5}           derivative of control surface coefficient
 (fppcampos) {0,1,4}          position of fpp camera
 (defaultspeed) {100}         default initial speed,m/s
-(compnum) {9}                number of components        
+(retractablegear) {1}	      0:fixed 1:retractable
+(compnum) {11}                number of components        
 
-(0comptype) {1}           1-airfoil, horizontal stabilizer
+(0comptype) {1}           1: airfoil, horizontal stabilizer
 (0location) {0,1.1,-5.2}      m
 (0rotation) {2,0,0}       deg
 (0size) {3.4}               m^2
@@ -29,70 +30,91 @@
 (1chartid) {0}
 (1ar) {2.1}
 
-(2comptype) {1}            right wing
-(2location) {3.6,0,-0.1}
+(2comptype) {1}            outer right wing, with ailerons
+(2location) {3.8,0,-0.4}
 (2rotation) {0,0,2}
-(2size) {8.75}
-(2controlsize) {0.076}
+(2size) {3.16}
+(2controlsize) {0.21}
 (2controlangleup) {10}
 (2controlangledown) {10}
 (2controlsensit) {0,0,1}
 (2chartid) {1}
-(2ar) {2.86}
+(2ar) {2.86}				aspect ratio for the whole wing
 
-(3comptype) {1}            left wing
-(3location) {-3.6,0,-0.1}
+(3comptype) {1}            outer left wing, with ailerons
+(3location) {-3.8,0,-0.4}
 (3rotation) {0,0,-2}
-(3size) {8.75}
-(3controlsize) {0.076}
+(3size) {3.16}
+(3controlsize) {0.21}
 (3controlangleup) {10}
 (3controlangledown) {10}
 (3controlsensit) {0,0,-1}
 (3chartid) {1}
 (3ar) {2.86}
 
-(4comptype) {0}            component type 0-fuselage
-(4location) {0,0,0}
-(4rotation) {0,0,0}
-(4length) {10}
-(4diameter) {1.2}
-(4cdcross) {0.5}   drag coefficient for cross-section of fuselage, related to max width of that fuselage times unit length, 0.5 is for cylinder
+(4comptype) {1}            inner right wing, with flaps
+(4location) {1.55,0,-0.1}
+(4rotation) {0,0,2}
+(4size) {4.66}
+(4controlsize) {0.17}
+(4controlangleup) {10}
+(4controlangledown) {10}
+(4controlsensit) {0,0,0}	it does not react to controls
+(4flapangle) {45}		max flap angle, deg
+(4chartid) {1}
+(4ar) {2.86}
 
-(5comptype) {2}            component type 2-engine
-(5location) {0,0,-6}
-(5rotation) {0,0,0}
-(5maxthrust) {10800}       max thrust at sea level, standard atmosphere
+(5comptype) {1}            inner left wing, with flaps
+(5location) {-1.55,0,-0.1}
+(5rotation) {0,0,-2}
+(5size) {4.66}
+(5controlsize) {0.17}
+(5controlangleup) {10}
+(5controlangledown) {10}
+(5controlsensit) {0,0,0}
+(5flapangle) {45}
+(5chartid) {1}
+(5ar) {2.86}
 
-
-(6comptype) {3}		3-landing gear, nose wheel
-(6retractable) {0}
-(6swivel)      {1}
-(6braked)      {0}
-(6location) {0,-1,2.9}
+(6comptype) {0}            component type 0: fuselage
+(6location) {0,0,0}
 (6rotation) {0,0,0}
-(6travel)   {0.5}
-(6springcoef) {80000}	N/m
-(6dampcoef)   {8000}	N/(m*s)
+(6length) {10}
+(6diameter) {1.2}
+(6cdcross) {0.5}   drag coefficient for cross-section of fuselage, related to max width of that fuselage times unit length, 0.5 is for cylinder
 
-(7comptype) {3}		3-landing gear, right wheel
-(7retractable) {0}
-(7swivel)      {0}
-(7braked)      {1}
-(7location) {1.7,-1,-0.4}
+(7comptype) {2}            component type 2-engine
+(7location) {0,0,-6}
 (7rotation) {0,0,0}
-(7travel)   {0.5}
-(7springcoef) {120000}	N/m
-(7dampcoef)   {12000}	N/(m*s)
+(7maxthrust) {10800}       max thrust at sea level, standard atmosphere
 
-(8comptype) {3}		3-landing gear, left wheel
-(8retractable) {0}
-(8swivel)      {0}
-(8braked)      {1}
-(8location) {-1.7,-1,-0.4}
+
+(8comptype) {3}		3: landing gear, nose wheel
+(8swivel)      {1}
+(8braked)      {0}
+(8location) {0,-1,2.9}
 (8rotation) {0,0,0}
 (8travel)   {0.5}
-(8springcoef) {120000}	N/m
-(8dampcoef)   {12000}	N/(m*s)
+(8springcoef) {80000}	N/m
+(8dampcoef)   {8000}	N/(m*s)
+
+(9comptype) {3}		3: landing gear, right wheel
+(9swivel)      {0}
+(9braked)      {1}
+(9location) {1.7,-1,-0.4}
+(9rotation) {0,0,0}
+(9travel)   {0.5}
+(9springcoef) {120000}	N/m
+(9dampcoef)   {12000}	N/(m*s)
+
+(10comptype) {3}		3: landing gear, left wheel
+(10swivel)      {0}
+(10braked)      {1}
+(10location) {-1.7,-1,-0.4}
+(10rotation) {0,0,0}
+(10travel)   {0.5}
+(10springcoef) {120000}	N/m
+(10dampcoef)   {12000}	N/(m*s)
 
 (0c0) {0,0,-0.006}  chart no 0, angle 0 deg, naca0012
 (0c1) {0,1.1,-0.013} chart no 0, angle 10 deg

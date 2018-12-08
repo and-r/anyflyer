@@ -11,16 +11,18 @@ using namespace irr;
 constexpr float PI=3.141592654;
 enum class FLIGHTSTATE{FLYING=0,LANDED=1,CRASHED=2};
 enum class COMPONENTTYPE{FUSELAGE=0,AIRFOIL=1,ENGINE=2,GEAR=3};
+enum class FLAPSTATE{NOFLAPS=0,CRUISE=1,TAKEOFF=2,INTERMEDIATE=3,LANDING=4};
 using VectorIntegralFuncType = core::vector3df (*)(core::vector3df,core::vector3df,float);
 using QuaternionIntegralFuncType = core::quaternion (*)(core::vector3df,core::vector3df,float);
 
 struct FoilProps
 {
     float fControlPower;
-    float fControlAngleUp;  //max angle up of control surface, radians
-    float fControlAngleDown;  //max angle down of control surface, radians
+    float fControlAngleUp;  //max angle up of the control surface, radians
+    float fControlAngleDown;  //max angle down of the control surface, radians
+	float fFlapAngle;		//max angle down for the surface to act as a flap,radians
     core::vector3df ControlSensit;  //influence of ailerons, elevator and rudder, limit values: -1 to 1
-    core::vector3df Chart[36];  //aerodynamic characteristic of this foil
+    core::vector3df Chart[36];  //CL/CD table of this foil
 };
 struct FuselageProps
 {
@@ -35,16 +37,12 @@ struct EngineProps
 struct GearProps
 {
 	bool bIntact;		//current status intact/damaged
-	bool bRetractable;		//loaded from file	
-	bool bDown;			//current position up/down
 	bool bSwivel;		//loaded from file, is the wheel self aligning
 	bool bBraked;		//loaded from file
 	float fDeflection;  //deflection at current frame
 	float fTravel;			//loaded from file,	maximum deflection that the gear withstands
 	float fSpringCoef;	//loaded from file	
 	float fDampCoef;	//loaded from file	
-	float fTransferTime;	//loaded from file	
-	float fTimeToTransfer;	//time to complete current operation of retracting or extending
 };
 
 struct Component
@@ -88,6 +86,12 @@ private:
 	float fBrakeLeftSignal{};
     int iPower = 75;  //aktualna moc silnika
     int iPitchTrim = 0;
+	float fGearTransferTime;	//loaded from file, time of retracting or extending gear in seconds	
+	float fGearTimeToTransfer;	//time to complete current operation of retracting or extending in seconds, positive: from up to down, negative: down to up
+	bool bRetractableGear;		//true:retractable, false:fixed, loaded from file	
+	bool bGearDown;			//current position up/down
+	float fFlapTransferTime;	//loaded from file, time of retracting or extending flaps between neighboring states in seconds
+	float fFlapTimeToTransfer;	//time to complete current operation of retracting or extending in seconds, positive, up to down, negative: down to up
 
 public:
     UavNode(scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id,scene::IMesh* mesh)  //konstruktor - jedyny, argumentowy
@@ -118,6 +122,7 @@ public:
 	static float fGripspeed;	//speed above which there is full grip coefficient, m/s
     friend class UavArray;
     FLIGHTSTATE eSTATE=FLIGHTSTATE::FLYING;
+	FLAPSTATE eFLAPSTATE = FLAPSTATE::NOFLAPS;
     core::vector3df Speed{};
     core::vector3df RotSpeed{};
     virtual void OnRegisterSceneNode()
@@ -233,18 +238,63 @@ public:
     virtual void AddPower()
     {
         iPower+=5;
-        if (iPower > 100){iPower = 100;}  //górne ograniczenie
+        if (iPower > 100){iPower = 100;}  //upper limit
     }
     virtual void DecreasePower()
     {
         iPower-=5;
-        if (iPower < 0){iPower = 0;}  //dolne ograniczenie
+        if (iPower < 0){iPower = 0;}  //lower limit
     }
     virtual int getPower()
     {
         return iPower;
     }
-
+	virtual void DecreaseFlaps()
+	{
+		if ((eFLAPSTATE == FLAPSTATE::NOFLAPS) || (eFLAPSTATE == FLAPSTATE::CRUISE)) { return; }  //there are no flaps, or in upper position, do not change anything
+		if (fFlapTimeToTransfer != 0) { return; }  //flaps are currently being transferred, no action now
+		fFlapTimeToTransfer = -fFlapTransferTime; //set beginning of tranfer from lower to upper position
+	}
+	virtual void IncreaseFlaps()
+	{
+		if ((eFLAPSTATE == FLAPSTATE::NOFLAPS) || (eFLAPSTATE == FLAPSTATE::LANDING)) { return; }  //there are no flaps, or in lowest position, do not change anything
+		if (fFlapTimeToTransfer != 0) { return; }  //flaps are currently being transferred, no action now
+		fFlapTimeToTransfer = fFlapTransferTime; //set beginning of tranfer from upper to lower position
+	}
+	virtual void ChangeGear()
+	{
+		if ((bRetractableGear == false) || (fGearTimeToTransfer != 0)) { return; }  //gear is not retractable or is curretnly being changed
+		if (bGearDown == true) 
+		{ fGearTimeToTransfer = -fGearTransferTime; }
+		else
+		{fGearTimeToTransfer = fGearTransferTime;}
+	}
+	virtual void getFlapsAndGear(int& flapstate, int& gearstate)
+	{
+		if (fFlapTimeToTransfer != 0)
+		{
+			flapstate = -1;
+		}
+		else
+		{
+			flapstate = static_cast<int>(eFLAPSTATE);
+		}
+		if (bRetractableGear == false)
+		{
+			gearstate = 2; //fixed gear
+		}
+		else
+		{
+			if (fGearTimeToTransfer != 0)
+			{
+				gearstate = -1;
+			}
+			else
+			{
+				gearstate = static_cast<int>(bGearDown); //0: up position, 1: down position
+			}
+		}
+	}
     static void setpVfunc(VectorIntegralFuncType a)
     {
         pVfunc=a;
@@ -301,7 +351,52 @@ public:
 	core::vector3df Move(float deltaseconds, core::vector3df wind)
 	{
 		//    static int cntr=0;//tymczasowo!!!
+		//Actions on flaps
+		if (fFlapTimeToTransfer > 0)
+		{
+			fFlapTimeToTransfer -= deltaseconds;
+			if (fFlapTimeToTransfer <= 0)
+			{ 
+				fFlapTimeToTransfer = 0;
+				int* statenumber = reinterpret_cast<int*>(&eFLAPSTATE);
+				*statenumber += 1;
+			}
+		}
+		if (fFlapTimeToTransfer < 0)
+		{
+			fFlapTimeToTransfer += deltaseconds;
+			if (fFlapTimeToTransfer >= 0)
+			{ 
+				fFlapTimeToTransfer = 0;
+				int* statenumber = reinterpret_cast<int*>(&eFLAPSTATE);
+				*statenumber -= 1;
+			}
+		}
+		//Actions on landing gear
+		if (fGearTimeToTransfer > 0)
+		{
+			fGearTimeToTransfer -= deltaseconds;
+			if (fGearTimeToTransfer <= 0)
+			{
+				fGearTimeToTransfer = 0;
+				bGearDown = true;
+			}
+		}
+		if (fGearTimeToTransfer < 0)
+		{
+			fGearTimeToTransfer += deltaseconds;
+			if (fGearTimeToTransfer >= 0)
+			{
+				fGearTimeToTransfer = 0;
+				if (bRetractableGear == true)
+				{
+					bGearDown = false;
+				}
+			}
+		}
 
+		//int* statenumber = reinterpret_cast<int*>(&eFLAPSTATE);
+		//*statenumber -= 1;
 												   //najpierw wartości liniowe
 		core::vector3df oldspeed = Speed;  //zapisanie poprzedniej wartości
 		core::vector3df forcetotal{};  //wektor główny siły, wyzerowany
@@ -373,124 +468,145 @@ protected:
 			lastalt = alt;
 		}
         core::vector3df uavairspeed = Speed - wind;  //układ globalny
-        AbsoluteTransformation.inverseRotateVect(uavairspeed);  //obracamy prędkość do układu samolot
+AbsoluteTransformation.inverseRotateVect(uavairspeed);  //obracamy prędkość do układu samolot
 
-		for (int i = 0; i<iCompNum; ++i)
-		{
-			switch (pComp[i].eCOMPTYPE)
-			{
-			case COMPONENTTYPE::FUSELAGE:
-			{
-                core::vector3df compairspeed = (RotSpeed.crossProduct(pComp[i].Location)) + uavairspeed;  //airspeed at fuselage - aircraft CS
-                core::vector3df airspeedcomp(pComp[i].Xvector.dotProduct(compairspeed),pComp[i].Yvector.dotProduct(compairspeed),
-                                             pComp[i].Zvector.dotProduct(compairspeed));  //airspeed at component, component CS
-                core::vector3df airspeedcompXY(airspeedcomp.X,airspeedcomp.Y,0);  //projection of airspeedcomp to XY plane
-                float fusaoa = atan(airspeedcompXY.getLength()/airspeedcomp.Z);
-                float speedmodule = compairspeed.getLength();
-                float sinfusaoa = sin(fusaoa);
-                float normalforce = pComp[i].FuselageP.fCcyl*speedmodule*speedmodule*sinfusaoa*sinfusaoa;
-                float cosfusaoa = cos(fusaoa);
-                float axialforce = pComp[i].FuselageP.fCstream*pow(speedmodule, 1.8)*cosfusaoa*cosfusaoa;
-                core::vector3df forcecomp = airspeedcompXY;
-                forcecomp.normalize();
-                forcecomp.X *= -normalforce; //minus because force is directed opposedly to speed vector
-                forcecomp.Y *= -normalforce;
-                forcecomp.Z = -axialforce;
-                //forcecomp is ready - force vector in comp CS
-                core::vector3df compforce = pComp[i].Xvector*forcecomp.X + pComp[i].Yvector*forcecomp.Y + pComp[i].Zvector*forcecomp.Z; //force vector in aircraft CS
-                forcetotal += compforce;  //force at component added to total force vector
+for (int i = 0; i < iCompNum; ++i)
+{
+	switch (pComp[i].eCOMPTYPE)
+	{
+	case COMPONENTTYPE::FUSELAGE:
+	{
+		core::vector3df compairspeed = (RotSpeed.crossProduct(pComp[i].Location)) + uavairspeed;  //airspeed at fuselage - aircraft CS
+		core::vector3df airspeedcomp(pComp[i].Xvector.dotProduct(compairspeed), pComp[i].Yvector.dotProduct(compairspeed),
+			pComp[i].Zvector.dotProduct(compairspeed));  //airspeed at component, component CS
+		core::vector3df airspeedcompXY(airspeedcomp.X, airspeedcomp.Y, 0);  //projection of airspeedcomp to XY plane
+		float fusaoa = atan(airspeedcompXY.getLength() / airspeedcomp.Z);
+		float speedmodule = compairspeed.getLength();
+		float sinfusaoa = sin(fusaoa);
+		float normalforce = pComp[i].FuselageP.fCcyl*speedmodule*speedmodule*sinfusaoa*sinfusaoa;
+		float cosfusaoa = cos(fusaoa);
+		float axialforce = pComp[i].FuselageP.fCstream*pow(speedmodule, 1.8)*cosfusaoa*cosfusaoa;
+		core::vector3df forcecomp = airspeedcompXY;
+		forcecomp.normalize();
+		forcecomp.X *= -normalforce; //minus because force is directed opposedly to speed vector
+		forcecomp.Y *= -normalforce;
+		forcecomp.Z = -axialforce;
+		//forcecomp is ready - force vector in comp CS
+		core::vector3df compforce = pComp[i].Xvector*forcecomp.X + pComp[i].Yvector*forcecomp.Y + pComp[i].Zvector*forcecomp.Z; //force vector in aircraft CS
+		forcetotal += compforce;  //force at component added to total force vector
 
 
-                core::vector3df forcepoint=pComp[i].Zvector * pComp[i].FuselageP.fLength025*cos(fusaoa); //point of force application
-                forcepoint += pComp[i].Location;  //here it is ready in aircraft CS
-                //momenttotal += forcepoint.crossProduct(compforce);  //moment generated by component added to total moment vector
+		core::vector3df forcepoint = pComp[i].Zvector * pComp[i].FuselageP.fLength025*cos(fusaoa); //point of force application
+		forcepoint += pComp[i].Location;  //here it is ready in aircraft CS
+		//momenttotal += forcepoint.crossProduct(compforce);  //moment generated by component added to total moment vector
 
 //                if (!(cntr%20))
 //                {
 //                    cout<<"fuselage compforce="<<compforce<<endl;
 //                }
 
-				break;
-			}
-			case COMPONENTTYPE::AIRFOIL:
+		break;
+	}
+	case COMPONENTTYPE::AIRFOIL:
 
+	{
+		core::vector3df compairspeed = (RotSpeed.crossProduct(pComp[i].Location)) + uavairspeed;  //obliczenie predkosci w komponentach - ukl aircraft
+		float speed_y = pComp[i].Yvector.dotProduct(compairspeed);  //składowa prędkości na kierunek Y komponentu
+		float speed_z = pComp[i].Zvector.dotProduct(compairspeed);  //składowa prędkości na kierunek Z komponentu
+		float angleofattack = atan2(-speed_y, speed_z) * 18 / PI;
+		//pComp[i].Rotation.inverseRotateVect(compairspeed);  //obrót predkosci do ukladu komponentu
+		//float angleofattack=atan2(-compairspeed.Y,compairspeed.Z)*18/PI;  //kat natarcia w [deg/10], minus bo ujemna prędkość Y to dodatni kąt natarcia
+		if (angleofattack < 0)
+		{
+			angleofattack += 36; //przejscie na tylko dodatnie katy
+		}
+		if (angleofattack == 36) { angleofattack = 0; }  //nie może być kąta 36
+
+														 //interpolacja wektora z charta
+		float d = angleofattack - static_cast<float>(int(angleofattack));  //część ułamkowa kąta natarcia
+		int thisindex = static_cast<int>(angleofattack);
+		int nextindex = thisindex + 1;
+		if (nextindex >= 36)
+		{
+			nextindex = 0;
+		}
+		core::vector3df nextvector = pComp[i].FoilP.Chart[nextindex];
+		core::vector3df chartforce = nextvector.getInterpolated(pComp[i].FoilP.Chart[thisindex], d);  //tutaj narazie tylko Cl,Cd, w układzie przepływu
+		float vsquarey = speed_y * speed_y;
+		float vsquarez = speed_z * speed_z;
+		//                float vsquarey=compairspeed.Y*compairspeed.Y;  //predkosc Y do kwadratu
+		//                float vsquarez=compairspeed.Z*compairspeed.Z; //predkosc Z do kwadratu
+
+						//if (!(cntr%20)&&(i==4||i==5))
+						//{
+						  //cout<<i<<" comp, thisindex="<<thisindex<<" nextindex="<<nextindex<<endl;
+						  //cout<<i<<" comp, compairspeed="<<compairspeed<<endl;
+						  //cout<<i<<" comp, angleofattack="<<angleofattack<<endl;
+						  //cout<<i<<" thisvector="<<pComp[i].FoilP.Chart[thisindex]<<endl;
+						  //cout<<i<<" nextvector="<<pComp[i].FoilP.Chart[nextindex]<<endl;
+						//}
+		chartforce *= (vsquarey + vsquarez);  //mnożymy półprodukt przez prędkość do kwadratu
+		core::vector3df dragforce = compairspeed;
+		dragforce.normalize();
+		dragforce *= chartforce.Z;  //opór w układzie aircraft
+		core::vector3df liftforce = compairspeed.crossProduct(pComp[i].Xvector);  //siła nośna jest prostopadła do prędkości i osi X komponentu
+		liftforce.normalize();
+		liftforce *= chartforce.Y;  //siła nośna w układzie aircraft
+
+		core::vector3df compforce = dragforce + liftforce;  //całkowita siła od komponentu w układzie aircraft
+
+        //calculation of force on the airfoil's control surface
+		core::vector3df controlresponse = pComp[i].FoilP.ControlSensit * ControlSignals;
+		if ((controlresponse != core::vector3df(0, 0, 0)) || (static_cast<int>(eFLAPSTATE) > 1) && pComp[i].FoilP.fFlapAngle > 0)
+			//if given signal corresponds to given sensitivity, or there are lowered flaps
+		{
+			//składowa siły steru na kierunek Z komponentu:
+			float responsesum = controlresponse.X + controlresponse.Y + controlresponse.Z;
+			if (responsesum > 1) { responsesum = 1; }  //lets limit it to range -1..1
+			else
+				if (responsesum < -1) { responsesum = -1; }
+			core::vector3df controldrag;
+			core::vector3df controllift;
+			float foilflapangle = 0;
+			if ((static_cast<int>(eFLAPSTATE) > 1) && (pComp[i].FoilP.fFlapAngle > 0))
 			{
-                core::vector3df compairspeed = (RotSpeed.crossProduct(pComp[i].Location)) + uavairspeed;  //obliczenie predkosci w komponentach - ukl aircraft
-				float speed_y = pComp[i].Yvector.dotProduct(compairspeed);  //składowa prędkości na kierunek Y komponentu
-				float speed_z = pComp[i].Zvector.dotProduct(compairspeed);  //składowa prędkości na kierunek Z komponentu
-				float angleofattack = atan2(-speed_y, speed_z) * 18 / PI;
-				//pComp[i].Rotation.inverseRotateVect(compairspeed);  //obrót predkosci do ukladu komponentu
-				//float angleofattack=atan2(-compairspeed.Y,compairspeed.Z)*18/PI;  //kat natarcia w [deg/10], minus bo ujemna prędkość Y to dodatni kąt natarcia
-				if (angleofattack < 0)
-				{
-					angleofattack += 36; //przejscie na tylko dodatnie katy
-				}
-				if (angleofattack == 36) { angleofattack = 0; }  //nie może być kąta 36
+				foilflapangle = pComp[i].FoilP.fFlapAngle * ((static_cast<float>(eFLAPSTATE)-1) / 3);  //in radians
+			}
+			float totalangle = 0;
+			if (responsesum > 0)
+			{
+				totalangle = pComp[i].FoilP.fControlAngleUp*responsesum - foilflapangle;
+			}
+			else
+			{
+				totalangle = pComp[i].FoilP.fControlAngleDown*responsesum - foilflapangle;
+			}
+//            if (!(cntr % 20) && (i==4 || i==5))
+//               {
+//                    cout<<i<<" totalangle= "<<totalangle*180/PI<<" responsesum="<<responsesum<<endl;
+//               }
 
-																 //interpolacja wektora z charta
-				float d = angleofattack - static_cast<float>(int(angleofattack));  //część ułamkowa kąta natarcia
-				int thisindex = static_cast<int>(angleofattack);
-				int nextindex = thisindex + 1;
-				if (nextindex >= 36)
-				{
-					nextindex = 0;
-				}
-				core::vector3df nextvector = pComp[i].FoilP.Chart[nextindex];
-				core::vector3df chartforce = nextvector.getInterpolated(pComp[i].FoilP.Chart[thisindex], d);  //tutaj narazie tylko Cl,Cd, w układzie przepływu
-				float vsquarey = speed_y * speed_y;
-				float vsquarez = speed_z * speed_z;
-				//                float vsquarey=compairspeed.Y*compairspeed.Y;  //predkosc Y do kwadratu
-				//                float vsquarez=compairspeed.Z*compairspeed.Z; //predkosc Z do kwadratu
+			float costotangle = cos(totalangle);
+			if (totalangle > 0)  //control surface deflected up
+            {
+                controldrag = pComp[i].Zvector * (-sin(totalangle)*costotangle*totalangle);
+                controllift = pComp[i].Yvector * -(costotangle*costotangle*totalangle);
+            }
+                else    //control surface deflected down
+            {
+                controldrag = pComp[i].Zvector * (-sin(totalangle)*costotangle*totalangle);
+                controllift = pComp[i].Yvector * -(costotangle*costotangle*totalangle);
+            }
 
-                                //if (!(cntr%20)&&(i==4||i==5))
-                                //{
-                                  //cout<<i<<" comp, thisindex="<<thisindex<<" nextindex="<<nextindex<<endl;
-                                  //cout<<i<<" comp, compairspeed="<<compairspeed<<endl;
-                                  //cout<<i<<" comp, angleofattack="<<angleofattack<<endl;
-                                  //cout<<i<<" thisvector="<<pComp[i].FoilP.Chart[thisindex]<<endl;
-                                  //cout<<i<<" nextvector="<<pComp[i].FoilP.Chart[nextindex]<<endl;
-                                //}
-				chartforce *= (vsquarey + vsquarez);  //mnożymy półprodukt przez prędkość do kwadratu
-				core::vector3df dragforce = compairspeed;
-				dragforce.normalize();
-                dragforce *= chartforce.Z;  //opór w układzie aircraft
-				core::vector3df liftforce = compairspeed.crossProduct(pComp[i].Xvector);  //siła nośna jest prostopadła do prędkości i osi X komponentu
-				liftforce.normalize();
-				liftforce *= chartforce.Y;  //siła nośna w układzie aircraft
-
-				core::vector3df compforce = dragforce + liftforce;  //całkowita siła od komponentu w układzie aircraft
-                //teraz obliczamy siły od powierzchni sterowych
-                core::vector3df controlresponse = pComp[i].FoilP.ControlSensit * ControlSignals;
-                if (controlresponse != core::vector3df(0,0,0)) //if given signal corresponds to given sensitivity
-				{
-                    //składowa siły steru na kierunek Z komponentu:
-                    float responsesum=controlresponse.X+controlresponse.Y+controlresponse.Z;
-                    if (responsesum > 1) {responsesum=1;}  //lets limit it to range -1..1
-                    else
-                        if (responsesum <-1){responsesum=-1;}
-                    core::vector3df controldrag;
-                    core::vector3df controllift;
-
-                    if (responsesum > 0)
-                    {
-                        controldrag = pComp[i].Zvector * (-sin(pComp[i].FoilP.fControlAngleUp*responsesum)*responsesum);
-                        controllift = pComp[i].Yvector * (cos(pComp[i].FoilP.fControlAngleUp*responsesum)*-responsesum);
-                    }
-                    else
-                    {
-                        controldrag = pComp[i].Zvector * (-sin(pComp[i].FoilP.fControlAngleDown*-responsesum)*-responsesum);
-                        controllift = pComp[i].Yvector * (cos(pComp[i].FoilP.fControlAngleDown*responsesum)*-responsesum);
-                    }
-
-                    core::vector3df controlforce = controldrag + controllift;
-                    controlforce *= vsquarez * pComp[i].FoilP.fControlPower;
-                    compforce += controlforce;
-
-//                    if (!cntr%20)
-//                    {
-//                         cout<<i<<" comp, controlresponse="<<controlresponse<<endl;
-//                    }
-				}
+            core::vector3df controlforce = controldrag + controllift;
+            controlforce *= vsquarez * pComp[i].FoilP.fControlPower;
+			/*if (!(cntr % 20) && (i == 4 || i == 5))
+			{
+				cout << i << " comp, compforce=" << compforce << endl;
+				cout << i << " comp, controlforce=" << controlforce << endl;
+			}*/
+            compforce += controlforce;
+			}
 
 
 				forcetotal += compforce;  //sumujemy
@@ -523,7 +639,7 @@ protected:
 			}
 			case COMPONENTTYPE::GEAR:
 			{
-				if (pComp[i].GearP.bDown = true)
+				if (bGearDown == true)
 				{
 					core::vector3df downpoint = pComp[i].Location;	//in aircraft CS
 					core::vector3df uppoint = downpoint + pComp[i].Yvector*pComp[i].GearP.fTravel;  //in aircraft CS

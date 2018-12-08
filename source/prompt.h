@@ -53,7 +53,7 @@ public:
     }
     virtual ~Prompt()
     {}
-    virtual void Draw(core::dimension2d<s32> pos=core::dimension2d<s32>(0,0))
+    virtual void Draw(core::dimension2d<s32> pos = core::dimension2d<s32>(0,0))
     {
         if (bVisible=true  && vList.size()>0)  //jesli menu nie jest widoczne, komenda Draw zmienia flage widocznosci na true
         {

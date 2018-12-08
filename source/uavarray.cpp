@@ -101,9 +101,38 @@ void UavArray::LoadData(UavNode* uav)
     float defaultspeed = sett.getVar<float>("defaultspeed"); //służy do modyfikacji wektora prędkości
     uav->Speed*=defaultspeed;
 
-    //przypisywanie właściwości komponentu
+	//LANDING GEAR
+	try
+	{
+		uav->bRetractableGear = sett.getVar<bool>("retractablegear");
+	}
+	catch (SimExceptContainer)
+	{
+		uav->bRetractableGear = false;
+	}
+	uav->bGearDown = (uav->bRetractableGear == true ? false : true);//gear is not retractable, so it is always down, otherwise it is initially in up position
+	try
+	{
+		uav->fGearTransferTime = sett.getVar<float>("geartransfertime");
+	}
+	catch (SimExceptContainer)
+	{
+		uav->fGearTransferTime = 4.0f; //it is not defined in the file, we are taking default value 5 s
+	}
+	uav->fGearTimeToTransfer = 0;  //initially gear is not being transferred
+	//FLAPS
+	try
+	{
+		uav->fFlapTransferTime = sett.getVar<float>("flaptransfertime");
+	}
+	catch (SimExceptContainer)
+	{
+		uav->fFlapTransferTime = 1.0f; //it is not defined in the file, we are taking default value 1 s
+	}
+	uav->fFlapTimeToTransfer = 0;  //initially flaps are not being transferred
+    //assigning properties to components
     uav->iCompNum=sett.getVar<int>("compnum");
-    uav->pComp = new Component[uav->iCompNum];  //utworzenie dynamicznej tablicy komponentów drona
+    uav->pComp = new Component[uav->iCompNum];  //creation of component dynamic array for the aircraft
     for(int i=0;i<uav->iCompNum;++i)
     {
         string varname(to_string(i)+"comptype");
@@ -144,13 +173,26 @@ void UavArray::LoadData(UavNode* uav)
             case COMPONENTTYPE::AIRFOIL:
             {
                 varname=to_string(i)+"size";
-                float size=sett.getVar<float>(varname);  //powierzchnia płata, zmienna posrednia, zaraz to wykorzystamy
+                float size=sett.getVar<float>(varname);  //area of the foil, intermediate variable, we will use it in a moment
                 varname=to_string(i)+"controlsize";
                 uav->pComp[i].FoilP.fControlPower=sett.getVar<float>(varname)*size*controlderiv;
                 varname=to_string(i)+"controlangleup";
                 uav->pComp[i].FoilP.fControlAngleUp=sett.getVar<float>(varname)*PI/180;
                 varname=to_string(i)+"controlangledown";
                 uav->pComp[i].FoilP.fControlAngleDown=sett.getVar<float>(varname)*PI/180;
+				try
+				{
+					varname = to_string(i) + "flapangle";
+					uav->pComp[i].FoilP.fFlapAngle = sett.getVar<float>(varname)*PI / 180;
+					if (uav->pComp[i].FoilP.fFlapAngle != 0)
+					{
+						uav->eFLAPSTATE = FLAPSTATE::CRUISE;  //there are operable flaps on this aircraft, so we switch the setting from NOFLAPS to CRUISE (0 deg)
+					}
+				}
+				catch (SimExceptContainer)
+				{
+					uav->pComp[i].FoilP.fFlapAngle = 0;  //parameter is not given in the file, there is no flap, so let's assign zero
+				}
                 varname=to_string(i)+"controlsensit";
                 uav->pComp[i].FoilP.ControlSensit=sett.getVar<core::vector3df>(varname);
 
@@ -184,8 +226,6 @@ void UavArray::LoadData(UavNode* uav)
             }
 		case COMPONENTTYPE::GEAR:
 		    {
-				varname = to_string(i) + "retractable";
-				uav->pComp[i].GearP.bRetractable = static_cast<bool>(sett.getVar<int>(varname));
 				varname = to_string(i) + "swivel";
 				uav->pComp[i].GearP.bSwivel = static_cast<bool>(sett.getVar<int>(varname));
 				varname = to_string(i) + "braked";
@@ -197,10 +237,8 @@ void UavArray::LoadData(UavNode* uav)
 				varname = to_string(i) + "dampcoef";
 				uav->pComp[i].GearP.fDampCoef = sett.getVar<float>(varname);
 				//setting initial values for other parameters
-				uav->pComp[i].GearP.bDown = true;
 				uav->pComp[i].GearP.bIntact = true;
 				uav->pComp[i].GearP.fDeflection = 0;
-				uav->pComp[i].GearP.fTimeToTransfer = 0;
 				break;
 		    }
         }

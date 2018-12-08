@@ -565,6 +565,47 @@ core::stringw SimMgr::getFlightPlan()
     return text.c_str();
 }
 
+core::stringw SimMgr::getFlapsAndGearText(UavNode* uav)
+{
+	string outtext;
+	int flapstate;
+	int gearstate;
+	uav->getFlapsAndGear(flapstate, gearstate);
+	//cout << "flaps: " << flapstate << "landing gear: " << gearstate << endl;
+	if ((flapstate != 0) && (flapstate != 1))
+	{
+		outtext = pDict->get(37);
+	}
+	switch (flapstate)
+	{
+	case -1:
+		outtext += pDict->get(38);   //"shifting.."
+		break;
+	case 2:
+		outtext += pDict->get(39);	//"take off"
+		break;
+	case 3:
+		outtext += pDict->get(40);   //"intermediate"
+		break;
+	case 4:
+		outtext += pDict->get(41);  //"landing"
+		break;
+	}
+	if (gearstate == -1)
+	{
+		if (outtext.empty()==false){ outtext += ", "; }
+		outtext += pDict->get(42);  //"Undercarriage:"
+		outtext += pDict->get(38);  //"shifting"
+	}
+	if (gearstate == 1)
+	{
+		if (outtext.empty() == false) { outtext += ", "; }
+		outtext += pDict->get(42);  //"Undercarriage:"
+		outtext += pDict->get(43);  //"down"
+	}
+	return outtext.c_str();
+}
+
 void SimMgr::LoadPlan(int choice=0)
 {
     for (auto k:vUavList)  //dodajemy maszyny odpowiedniego typu, zapisanego w liscie vUavlist
@@ -656,8 +697,9 @@ void SimMgr::LoadPlan(int choice=0)
     //--------------------
 
     //tworzymy infotext
-    MenuItem item5(pDict->get(34).c_str());
+    MenuItem item5(pDict->get(34).c_str()); //row with "Pause..."
     lista.push_back(item5);
+	lista.push_back(MenuItem());  //second, empty row
     pInfotext = new Prompt(pFont1,lista,0,video::SColor(255,0,0,128));
     //-----------------
 
@@ -710,14 +752,12 @@ inline bool SimMgr::Input()//obsługa wejścia klawiatury, true - wyjście z pę
         if (bPause)
         {
             bPause=false;
-            pInfotext->bVisible = false;
             pDevice->getCursorControl()->setVisible(false);
             pDevice->getCursorControl()->setPosition(s32(screenhalf.Width),s32(screenhalf.Height));
         }
         else
         {
             bPause=true;
-            pInfotext->bVisible = true;
             pDevice->getCursorControl()->setVisible(true);
         }
     }
@@ -877,6 +917,18 @@ inline bool SimMgr::Input()//obsługa wejścia klawiatury, true - wyjście z pę
 			{
 				uav->DecreasePower();  //drugi sposób zmiany mocy silnika
 			}
+			if (pReceiver->IsKeyPressed(irr::KEY_KEY_D))
+			{
+				uav->DecreaseFlaps();
+			}
+			if (pReceiver->IsKeyPressed(irr::KEY_KEY_F))
+			{
+				uav->IncreaseFlaps();
+			}
+			if (pReceiver->IsKeyPressed(irr::KEY_KEY_G))
+			{
+				uav->ChangeGear();
+			}
 //            static unsigned cntr=0;
             core::position2di currmousepos=pDevice->getCursorControl()->getPosition();
             core::position2di deltamousepos=currmousepos-core::dimension2di(screenhalf);
@@ -990,7 +1042,10 @@ return false;
 
 inline void SimMgr::DrawGui()
 {
+	static int counter = 0;
     core::dimension2d<u32> screensize=pDriver->getScreenSize();
+	pInfotext->bVisible = false;
+	static core::stringw flapsandgeartext=L"";
     if (pCamera->GetSelectedUav())
     {
         if (bHudOn && pCamera->GetState()!=CAMERASTATE::STAND)
@@ -1019,7 +1074,7 @@ inline void SimMgr::DrawGui()
            powertext+=L"%";
            core::rect<s32> powerrect(stickpixel.X-40,stickpixel.Y-70,stickpixel.X+40,stickpixel.Y-50);
            pFont1->draw(powertext,powerrect,HudColor,true,true);
-		   //force applied to brakes - only if there is any
+		   //show force applied to brakes - only if there is any
 		   if (fBrakeRightInput > 0 || fBrakeLeftInput > 0)
 		   {
 			   core::stringw braketext = pDict->get(36).c_str();
@@ -1034,20 +1089,41 @@ inline void SimMgr::DrawGui()
 			   pDriver->draw2DLine(core::vector2di(stickpixel.X - 80, stickpixel.Y + 40 - ibrakeright),
 				   core::vector2di(stickpixel.X - 40, stickpixel.Y + 40 - ibrakeright),HudColor);
 		   }
+		   //gathering information about flaps and landing gear
+		   if (counter%uParamRefresh == 0)
+		   {
+			   flapsandgeartext = getFlapsAndGearText(pCamera->GetSelectedUav());
+			   if (flapsandgeartext.size() > 0)
+			   {
+				    MenuItem item(flapsandgeartext);
+					pInfotext->Modify(item, 1);
+					pInfotext->Switch(1);
+			   }
+		   }
         }
     }
     if (pSimMenuList->bVisible)
     {
         pSimMenuList->Draw(MenuPos);
     }
+	if (flapsandgeartext.size()>0)
+	{
+		pInfotext->bVisible = true;
+	}
     if (pPrompt->bVisible)
     {
         pPrompt->Draw(PromptPos);
     }
+	if (bPause == true)
+	{
+		pInfotext->Switch(0);  //switch to text about pause
+		pInfotext->bVisible = true;
+	}
     if (pInfotext->bVisible)
     {
         pInfotext->Draw(core::dimension2di(screensize.Width+InfotextPos.Width,InfotextPos.Height));
     }
+	++counter;
 }
 inline void SimMgr::DrawHud()
 {
@@ -1057,7 +1133,7 @@ inline void SimMgr::DrawHud()
     static core::vector2di velpixel;
     static core::vector2di altpixel;
     static core::vector2di headpixel;
-    static unsigned counter=0;
+    static unsigned counter = 0;
     static core::stringw airspeedstring;
     static core::stringw altitudestring;
     static core::stringw headingstring;
