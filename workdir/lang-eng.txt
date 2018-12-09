@@ -29,6 +29,9 @@ A: throttle close one step
 Z,X: rudder left/right
 C,V: left/right wheel brake
 B: both wheel brakes
+F: flaps down
+D: flaps up
+G: undercarriage toggle
 Mouse move : stick control
 Mouse roller : pitch trim
 Mouse roller + Ctrl: throttle

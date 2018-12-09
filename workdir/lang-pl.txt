@@ -28,6 +28,9 @@ A: zamkniecie przepustnicy
 Z,X: ster kierunku
 C,V: lewy/prawy hamulec kol
 B: oba hamulce kol
+F: opuszczenie klap
+D: podniesienie klap
+G: opuszczanie/podnoszenie podwozia
 Ruch myszy : drazek sterowy
 Rolka myszy: trym steru poziomego
 Rolka myszy + Ctrl: przepustnica

@@ -1,4 +1,4 @@
-(langfile) {lang-pl.txt}        file containing texts
+(langfile) {lang-eng.txt}        file containing texts
 
 (xresolution) {1024}            initial window horizontal resolution
 
