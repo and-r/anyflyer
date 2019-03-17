@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <irrlicht.h>
+#include <dirent.h>  //needed to list directory content
 #include "settingsmgr.h"
 #include "dictionary.h"
 #include "simeventreceiver.h"
@@ -37,7 +38,8 @@ private:
     scene::ISceneManager* pScene=nullptr;//na koniec nie trzeba niszczyc
     video::IVideoDriver* pDriver=nullptr;//na koniec nie trzeba niszczyc
     scene::ISceneCollisionManager* pCollMan=nullptr;//na koniec nie trzeba niszczyc
-    scene::IMeshSceneNode* pTerrain=nullptr;//na koniec nie trzeba niszczyc
+    //scene::IMeshSceneNode* pTerrain=nullptr;//na koniec nie trzeba niszczyc
+	vector<scene::IMeshSceneNode*> vTerrain;  //vector of terrain objects, soft at the beginning, then hard
     scene::ILightSceneNode* pLight=nullptr;//na koniec nie trzeba niszczyc
     gui::IGUIFont* pFont0=nullptr;//na koniec nie trzeba niszczyc
     gui::IGUIFont* pFont1=nullptr;//na koniec nie trzeba niszczyc
@@ -50,6 +52,7 @@ private:
     core::matrix4 CamRotMatrix;
     video::SColor HudColor;
 	video::SColor SkyColor;
+	int iSoftTerrainNum = 0;
     unsigned uHudScale;
     unsigned uParamRefresh;
     unsigned uFrameDeltaTime;  //parametr obiektu - jest potrzebny w wielu miejscach
@@ -64,24 +67,11 @@ private:
     bool bImperialUnits;
 	int iFrameDelay=10;
     //planowanie lotu
-    std::vector<int> vUavList;
+    //vector<int> vUavList;
+	vector<string>vUavLst;
     COURSE eCOURSE = COURSE::N;
     int iAltitude = 1000;
 
-
-//    core::vector2di start(xpixel-14*uHudScale,ypixel);
-//    core::vector2di end(xpixel-6*uHudScale,ypixel);
-//    pDriver->draw2DLine(start,end,HudColor);  //rysuje linie
-//    start=core::vector2di(xpixel-3*uHudScale,ypixel+5*uHudScale);
-//    pDriver->draw2DLine(start,end,HudColor);  //rysuje linie
-//    end=core::vector2di(xpixel,ypixel);
-//    pDriver->draw2DLine(start,end,HudColor);  //rysuje linie
-//    start=core::vector2di(xpixel+3*uHudScale,ypixel+5*uHudScale);
-//    pDriver->draw2DLine(start,end,HudColor);  //rysuje linie
-//    end=core::vector2di(xpixel+6*uHudScale,ypixel);
-//    pDriver->draw2DLine(start,end,HudColor);  //rysuje linie
-//    start=core::vector2di(xpixel+14*uHudScale,ypixel);
-//    pDriver->draw2DLine(start,end,HudColor);  //rysuje linie
     core::dimension2di MenuPos=core::dimension2di(30,60);
     core::dimension2di PromptPos = core::dimension2di(30,10);
     core::dimension2di InfotextPos = core::dimension2di(-400,10);//od prawej krawedzi ekranu!
@@ -94,8 +84,9 @@ private:
     bool Input();//obsluga klawiatury i myszy, true = wyjscie z petli symulacji
     void DrawGui();
     void DrawHud();
-    void LoadPlan(int);
+    void LoadPlan();
     void ResetPlan();
+	void SetTerrain();  //loads meshes and textures for soft and hard terrain, sets sky color
     core::stringw getFlightPlan();
 	core::stringw getFlapsAndGearText(UavNode* uav);
 public:

@@ -61,3 +61,4 @@ to continue$
 41 #landing$
 42 #Undercarriage:$
 43 #down$
+44 #You need at least one aircraft to begin simulation$

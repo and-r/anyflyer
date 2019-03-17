@@ -60,3 +60,4 @@ spacje aby wylaczyc$
 41 #ladowanie$
 42 #Podwozie:$
 43 #wysuniete$
+44 #Potrzebujesz co najmniej jednego samolotu aby rozpoczac symulacje$

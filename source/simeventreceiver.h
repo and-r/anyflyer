@@ -16,7 +16,7 @@ public:
         }
         if (event.EventType == irr::EET_GUI_EVENT)
         {
-           cout<<"GUI event!"<<endl;
+           //cout<<"GUI event!"<<endl;
         }
         // Remember the mouse state
         if (event.EventType == irr::EET_MOUSE_INPUT_EVENT)

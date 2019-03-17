@@ -55,7 +55,7 @@
 (hudcolorblue) {50}
 
 (paramrefresh) {20}             frames between GUI elements refresh
-(imperialunits) {0}             0: meters,km/h 1: feet,kts
+(imperialunits) {1}             0: meters,km/h 1: feet,kts
 
 (mousespeed) {3}               integer number, control characteristics
 

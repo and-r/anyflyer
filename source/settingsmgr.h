@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <vector>
 #include <irrlicht.h>
+#include <cstdlib>  //needed for wcstombs()
 #include "secontainer.h"
 using namespace std;
 using namespace irr;
@@ -65,6 +66,7 @@ private:
 public:
     SettingsMgr();
     int ReadSettings(const char* filename);
+	int ReadSettings(const wchar_t* filename);
 
     template <typename T>
     T getVar (string varname)

@@ -1,0 +1,203 @@
+(mass) {3000}                 mass in kilograms
+(cog) {0,0,0}             	center of mass
+(mominert) {48000,60000,12000}   moments of intertia: xx, yy, zz, w kg*m^2
+(controlderiv) {5}           derivative of control surface coefficient
+(fppcampos) {0,1,4}          position of fpp camera
+(defaultspeed) {100}         default initial speed,m/s
+(retractablegear) {1}	      0:fixed 1:retractable
+(compnum) {11}                number of components        
+
+(0comptype) {1}           1: airfoil, horizontal stabilizer
+(0location) {0,1.1,-5.2}      m
+(0rotation) {2,0,0}       deg
+(0size) {3.4}               m^2
+(0controlsize) {0.35}            control surface area/airfoil area
+(0controlangleup) {28}           max angle up, deg
+(0controlangledown) {18}        max angle down, deg
+(0controlsensit) {1,0,0}        elevator sensitivity,rudder sens.,aileron sens.
+(0chartid) {0}            id of chart
+(0ar) {2.1}                 aspect ratio
+
+(1comptype) {1}           vertical stabilizer
+(1location) {0,1.7,-5.3}
+(1rotation) {0,0,-90}
+(1size) {1.8}
+(1controlsize) {0.3}
+(1controlangleup) {27}
+(1controlangledown) {27}
+(1controlsensit) {0,1,0}
+(1chartid) {0}
+(1ar) {2.1}
+
+(2comptype) {1}            outer right wing, with ailerons
+(2location) {3.8,0,-0.4}
+(2rotation) {0,0,2}
+(2size) {3.16}
+(2controlsize) {0.21}
+(2controlangleup) {10}
+(2controlangledown) {10}
+(2controlsensit) {0,0,1}
+(2chartid) {1}
+(2ar) {2.86}				aspect ratio for the whole wing
+
+(3comptype) {1}            outer left wing, with ailerons
+(3location) {-3.8,0,-0.4}
+(3rotation) {0,0,-2}
+(3size) {3.16}
+(3controlsize) {0.21}
+(3controlangleup) {10}
+(3controlangledown) {10}
+(3controlsensit) {0,0,-1}
+(3chartid) {1}
+(3ar) {2.86}
+
+(4comptype) {1}            inner right wing, with flaps
+(4location) {1.55,0,-0.1}
+(4rotation) {0,0,2}
+(4size) {4.66}
+(4controlsize) {0.17}
+(4controlangleup) {10}
+(4controlangledown) {10}
+(4controlsensit) {0,0,0}	it does not react to controls
+(4flapangle) {45}		max flap angle, deg
+(4chartid) {1}
+(4ar) {2.86}
+
+(5comptype) {1}            inner left wing, with flaps
+(5location) {-1.55,0,-0.1}
+(5rotation) {0,0,-2}
+(5size) {4.66}
+(5controlsize) {0.17}
+(5controlangleup) {10}
+(5controlangledown) {10}
+(5controlsensit) {0,0,0}
+(5flapangle) {45}
+(5chartid) {1}
+(5ar) {2.86}
+
+(6comptype) {0}            component type 0: fuselage
+(6location) {0,0,0}
+(6rotation) {0,0,0}
+(6length)    {10}
+(6diameter)  {1.2}
+(6cdcross)   {0.5}   drag coefficient for cross-section of fuselage, related to max width of that fuselage times unit length, 0.5 is for cylinder
+(6meshfile)  {g3}	file containing covers of undercarriage
+
+(7comptype) {2}            component type 2-engine
+(7location) {0,0,-6}
+(7rotation) {0,0,0}
+(7maxthrust) {10800}       max thrust at sea level, standard atmosphere
+
+
+(8comptype) {3}		3: landing gear, nose wheel
+(8swivel)      {1}
+(8braked)      {0}
+(8location) {0,-1,2.95}
+(8rotation) {0,0,0}
+(8travel)   {0.5}
+(8springcoef) {80000}	N/m
+(8dampcoef)   {8000}	N/(m*s)
+(8meshfile)    {g0}
+(8axislocation)  {0,-0.34,3.06}   axis location relative to wheel location
+(8axisrotation)	 {-128,0,0}	degrees
+
+(9comptype) {3}		3: landing gear, right wheel
+(9swivel)      {0}
+(9braked)      {1}
+(9location) {1.7,-1,-0.57}
+(9rotation) {0,0,0}
+(9travel)   {0.5}
+(9springcoef) {120000}	N/m
+(9dampcoef)   {12000}	N/(m*s)
+(9meshfile)    {g2}
+(9axislocation)  {1.54,0.12,-0.57}   axis location relative to wheel location
+(9axisrotation)	 {0,0,-85}	degrees
+
+(10comptype)    {3}		3: landing gear, left wheel
+(10swivel)      {0}
+(10braked)      {1}
+(10location) {-1.7,-1,-0.57}
+(10rotation) {0,0,0}
+(10travel)   {0.5}
+(10springcoef) {120000}	N/m
+(10dampcoef)   {12000}	N/(m*s)
+(10meshfile)    {g1}
+(10axislocation)  {-1.54,0.12,-0.57}   axis location relative to wheel location
+(10axisrotation)  {0,0,85}	degrees
+
+(0c0) {0,0,-0.006}  chart no 0, angle 0 deg, naca0012
+(0c1) {0,1.1,-0.013} chart no 0, angle 10 deg
+(0c2) {0,0.7,-0.3}
+(0c3) {0,0.9,-0.6}
+(0c4) {0,1.05,-0.9}
+(0c5) {0,1.05,-1.2}
+(0c6) {0,0.9,-1.5}
+(0c7) {0,0.65,-1.7}
+(0c8) {0,0.35,-1.8}
+(0c9) {0,0.05,-1.8}
+(0c10) {0,-0.25,-1.75}
+(0c11) {0,-0.5,-1.6}
+(0c12) {0,-0.75,-1.45}
+(0c13) {0,-0.9,-1.25}
+(0c14) {0,-0.95,-1}
+(0c15) {0,-0.85,-0.6}
+(0c16) {0,-0.65,-0.3}
+(0c17) {0,-0.85,-0.15}
+(0c18) {0,0,-0.03}
+
+(0c35) {0,-1.1,-0.013}
+(0c34) {0,-0.7,-0.3}
+(0c33) {0,-0.9,-0.6}
+(0c32) {0,-1.05,-0.9}
+(0c31) {0,-1.05,-1.2}
+(0c30) {0,-0.9,-1.5}
+(0c29) {0,-0.65,-1.7}
+(0c28) {0,-0.35,-1.8}
+(0c27) {0,-0.05,-1.8}
+(0c26) {0,0.25,-1.75}
+(0c25) {0,0.5,-1.6}
+(0c24) {0,0.75,-1.45}
+(0c23) {0,0.9,-1.25}
+(0c22) {0,0.95,-1}
+(0c21) {0,0.85,-0.6}
+(0c20) {0,0.65,-0.3}
+(0c19) {0,0.85,-0.15}
+
+(1c0) {0,0.18,-0.005}  chart no 1, angle 0 deg, naca63209
+(1c1) {0,1.13,-0.03}   chart no 1, angle 10 deg
+(1c2) {0,0.7,-0.3}
+(1c3) {0,0.9,-0.6}
+(1c4) {0,1.05,-0.9}
+(1c5) {0,1.05,-1.2}
+(1c6) {0,0.9,-1.5}
+(1c7) {0,0.65,-1.7}
+(1c8) {0,0.35,-1.8}
+(1c9) {0,0.05,-1.8}
+(1c10) {0,-0.25,-1.75}
+(1c11) {0,-0.5,-1.6}
+(1c12) {0,-0.75,-1.45}
+(1c13) {0,-0.9,-1.25}
+(1c14) {0,-0.95,-1}
+(1c15) {0,-0.85,-0.6}
+(1c16) {0,-0.65,-0.3}
+(1c17) {0,-0.85,-0.15}
+(1c18) {0,0,-0.03}
+
+(1c35) {0,-0.5,-0.06}
+(1c34) {0,-0.7,-0.3}
+(1c33) {0,-0.9,-0.6}
+(1c32) {0,-1.05,-0.9}
+(1c31) {0,-1.05,-1.2}
+(1c30) {0,-0.9,-1.5}
+(1c29) {0,-0.65,-1.7}
+(1c28) {0,-0.35,-1.8}
+(1c27) {0,-0.05,-1.8}
+(1c26) {0,0.25,-1.75}
+(1c25) {0,0.5,-1.6}
+(1c24) {0,0.75,-1.45}
+(1c23) {0,0.9,-1.25}
+(1c22) {0,0.95,-1}
+(1c21) {0,0.85,-0.6}
+(1c20) {0,0.65,-0.3}
+(1c19) {0,0.85,-0.15}
+

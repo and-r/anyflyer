@@ -80,39 +80,8 @@ void SimMgr::BeginScene()
         pFont1=pDevice->getGUIEnvironment()->getBuiltInFont();//uzyj czcionki wbudowanej
     }
 
-    //dodajemy teren - pustynię
-    string mapname(pSett->getVar<string>("mapname"));
-    string terrainmeshpath("terrain/"+mapname+".3ds");
-    pTerrain = pScene->addOctreeSceneNode(pScene->getMesh(terrainmeshpath.data()));//dodaje mapę jako node do sceny
-    if (!pTerrain)
-    {
-        SimExceptContainer capsule;
-        throw capsule;
-    }
-    pTerrain->setMaterialFlag(video::EMF_LIGHTING, true);//dynamic light
-    //na teren nakladamy teksture
-    string terraintexturepath("terrain/"+mapname+".jpg");
-    //pTerrain->setMaterialTexture(0,pDriver->getTexture(terraintexturepath.data()));
-    for (int i=0;i<pTerrain->getMaterialCount();++i)
-    {
-        pTerrain->getMaterial(i).setTexture(0,pDriver->getTexture(terraintexturepath.data()));
-        pTerrain->getMaterial(i).AmbientColor.setAlpha(255);
-        pTerrain->getMaterial(i).AmbientColor.setRed(100);
-        pTerrain->getMaterial(i).AmbientColor.setGreen(100);
-        pTerrain->getMaterial(i).AmbientColor.setBlue(100);
-        pTerrain->getMaterial(i).SpecularColor.setAlpha(255);
-        pTerrain->getMaterial(i).SpecularColor.setRed(0);
-        pTerrain->getMaterial(i).SpecularColor.setGreen(0);
-        pTerrain->getMaterial(i).SpecularColor.setBlue(0);
-    }
-    //ustawiamy swiatlo ambient
-    float col=pSett->getVar<float>("ambientlightlevel");
-    pScene->setAmbientLight(video::SColorf(col,col,col,col));
-    //ustawiamy kolor cienia
-    pScene->setShadowColor(video::SColor(pSett->getVar<unsigned>("shadowintensity"),0,0,0));
-	//sky color
-	core::vector3df rgb = pSett->getVar<core::vector3df>("skycolor");
-	SkyColor = video::SColor(255, u32(rgb.X), u32(rgb.Y), u32(rgb.Z));
+	SetTerrain();
+
     //ustawiamy skale symboli HUD
     uHudScale=pSett->getVar<unsigned>("hudscale");
     for (int i=0;i<7;++i)  //mnożymy współrzędne punktów znaku "waterline" przez skale HUD
@@ -129,30 +98,7 @@ void SimMgr::BeginScene()
     iMouseReturnSpeed=pSett->getVar<int>("mousereturnspeed");
     iTrimStep = pSett->getVar<int>("trimstep");
 	iFrameDelay = pSett->getVar<int>("minframedelay");
-    //dodajemy swiatlo kierunkowe
-    core::vector3df lightpos(pSett->getVar<float>("light_x"),pSett->getVar<float>("light_y"),pSett->getVar<float>("light_z"));
-    col=pSett->getVar<float>("lightlevel");
-    pLight=pScene->addLightSceneNode(0,lightpos,video::SColorf(col,col,col),pSett->getVar<float>("lightradius"));
-    if (!pLight)
-    {
-        SimExceptContainer capsule;
-        capsule.sText=pDict->get(3);
-        throw capsule;
-    }
-
-    video::ITexture*  lightbillboardtexture=pDriver->getTexture("terrain/sun.bmp");
-    if (lightbillboardtexture)
-    {
-        float lpicsize=pSett->getVar<float>("lightpicturesize");
-        scene::IBillboardSceneNode* lightbillboard=pScene->addBillboardSceneNode(static_cast<scene::ISceneNode*>(pLight),core::dimension2df(lpicsize,lpicsize));
-        lightbillboard->setMaterialFlag(video::EMF_LIGHTING, false);
-        lightbillboard->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
-        lightbillboard->setMaterialTexture(0,lightbillboardtexture);
-    }
-    //dodajemy triangle selector
-    scene::ITriangleSelector* selector = pScene->createOctreeTriangleSelector(pTerrain->getMesh(),pTerrain,128);
-    pTerrain->setTriangleSelector(selector);
-    selector->drop();
+    
     //ustawiamy przyspieszenie ziemskie i parametry atmosfery
         UavNode::fGaccel = pSett->getVar<float>("gaccel");
         UavNode::fRozero = pSett->getVar<float>("rozero")*0.5;  //gęstość w programie będzie podzielona na dwa! Zeby pominąć dzielenie w wyliczeniu sił
@@ -193,7 +139,6 @@ void SimMgr::Run()
 {
     while(1)
     {
-        //ładowanie planu lotu(tworzenie tablicy dronów, ustawianie ich pozycji)
         switch (Menu())
         {
         case MENU_ANSW::EXITAPP:
@@ -202,7 +147,7 @@ void SimMgr::Run()
         case MENU_ANSW::FLY:
             try
             {
-                LoadPlan(0);  //plan lotu zero(domyślny):utworzenie jednego drona kierowanego przez usera, ustawienia domyślne
+                LoadPlan();
                 //oprócz tego przygotowanie obiektów na 1 symulację: kamery i obiektów GUI
                 Fly();  //metoda zawierająca główną pętlę symulacji, noexcept!
                 ResetPlan();  //usunięcie dronów i obiektów tworzonych na czas 1 symulacji i 1 planu
@@ -222,7 +167,7 @@ MENU_ANSW SimMgr::Menu()
 {
     MenuItem functionanswer{};  //tu znajdzie sie odpowiedz funkcji
     //najpierw tworzymy kamere
-    core::aabbox3d<f32> terrainbox=pTerrain->getBoundingBox();
+    core::aabbox3d<f32> terrainbox=vTerrain[0]->getBoundingBox();
     core::vector3df camerapos=terrainbox.getCenter()+core::vector3df(0,(terrainbox.getExtent().getLength()/2),(-terrainbox.getExtent().getLength()/4));
     scene::ICameraSceneNode* camera = pScene->addCameraSceneNode(0,camerapos,terrainbox.getCenter());//trzeba na koniec zniszczyć
     pScene->setActiveCamera(camera);
@@ -283,6 +228,10 @@ MENU_ANSW SimMgr::Menu()
 	item2.eANSWER = MENU_ANSW::NOTHING;
 	lista.push_back(item2);
 
+	item2.sDescription = pDict->get(44).c_str(); //"you need at least one aircraft to begin simulation"
+	item2.eANSWER = MENU_ANSW::NOTHING;
+	lista.push_back(item2);
+
     Prompt* p_prompt=new Prompt(pFont1,lista,0,video::SColor(255,0,0,128));
     lista.clear();
     //---------------
@@ -316,42 +265,61 @@ MENU_ANSW SimMgr::Menu()
     int typecounter=0;
     MenuItem item4{};
 
-    try
-    {
-        while (1)
-        {
-            SettingsMgr sett;
-            string uavdatapath("aircraft/u"+to_string(typecounter)+".dat");
-            if (sett.ReadSettings(uavdatapath.data()))  //nie znaleziono, wychodzimy z petli
-            {
-                break;
-            }
+
+	DIR* directory;		//DIR is defined in dirent.h
+	dirent* direntity;	//dirent is defined in dirent.h
+    //vector<string> acdirlist{};
+	vector<string> availableactype{};  //list analoguous to lista, but of string type
+	if ((directory = opendir("aircraft")) != nullptr)
+	{
+		while ((direntity = readdir(directory)) != nullptr)
+		{
+#ifdef _IRR_WINDOWS
+            if ((direntity->d_name[0] != '.')&&(direntity->d_type==16384))  //when item not hidden (with dot at first character) and type of directory (16384)
+#else
+            if ((direntity->d_name[0] != '.')&&(direntity->d_type==DT_DIR))  //when item not hidden (with dot at first character) and type of directory (DT_DIR)
+#endif
+			{
+				string uavdatapath("aircraft/");
+				uavdatapath += direntity->d_name;
+				uavdatapath += "/properties.dat";
+				SettingsMgr sett;
+				if (sett.ReadSettings(uavdatapath.data()))  //file not found
+				{
+					continue;
+				}
+				//acdirlist.push_back(direntity->d_name);
+				item4 = MenuItem(direntity->d_name,MENU_ANSW::UAVTYPE,typecounter);  //typecounter needed to identify type from availableactype
+				lista.push_back(item4);
+				availableactype.push_back(direntity->d_name);
+				++typecounter;
+			}
+		}
+		closedir(directory);
+		if (lista.size() == 0)
+		{
+			SimExceptContainer capsule;
+			capsule.sText = "there isn't any aircraft type directory inside 'aircraft' directory";
+			throw capsule;
+		}
+	}
+	else
+	{
+		SimExceptContainer capsule;
+		capsule.sText = "there is no directory 'aircraft'";
+		throw capsule;
+	}
 
 
-            item4.eANSWER=MENU_ANSW::UAVTYPE;
-            item4.iParameter = typecounter;
-            item4.sDescription = sett.getVar<string>("type").c_str();
-            lista.push_back(item4);
-            ++typecounter;
-        }
-    }
-    catch (SimExceptContainer capsule)
-    {
-        if (typecounter>0)
-            {
-            //nic nie rób - po prostu nie ma kolejnego pliku, albo nazwa samolotu w nim jest nieczytelna
-            }
-        else
-            {throw;}  //nie ma żadnego pliku samolotu, trzeba opuścić program
-    }
     MenuList* p_uavlist = new MenuList(pFont1,lista);
     p_flightplan->SetSubmenu(MENU_ANSW::ADDUAV,p_uavlist);
     p_uavlist = nullptr;  //mozna wyzerowac
 
 
-    if ((vUavList.size() == 0)&&(lista.size()>0))  //domyslnie jeden samolot bedzie w liscie na poczatku, o ile chociaz 1 typ jest w katalogu
+    if ((vUavLst.size() == 0)&&(availableactype.size()>0))  //by default, one aircraft will be in the list, if there is any in the 'aircraft'directory
     {
-       vUavList.push_back(0);  //dodajemy pojedynczy samolot typu 0
+		vUavLst.push_back(availableactype[0]);  //by default, the aircraft from the first AC type directory is chosen
+       //vUavList.push_back(0);  //dodajemy pojedynczy samolot typu 0
     }
     lista.clear();
     p_prompt->Modify(MenuItem(getFlightPlan()),1);  //dodany samolot - modyfikujemy opis planu lotu
@@ -444,12 +412,15 @@ MENU_ANSW SimMgr::Menu()
         switch (answer.eANSWER)
         {
         case MENU_ANSW::UAVTYPE:
-            vUavList.push_back(answer.iParameter);
+            vUavLst.push_back(availableactype[answer.iParameter]);
             p_prompt->Modify(MenuItem(getFlightPlan()),1);
             break;
         case MENU_ANSW::REMOVEUAV:
-            vUavList.pop_back();
-            p_prompt->Modify(MenuItem(getFlightPlan()),1);
+            if (vUavLst.size()>0)
+            {
+                vUavLst.pop_back();
+                p_prompt->Modify(MenuItem(getFlightPlan()),1);
+            }
             break;
         case MENU_ANSW::COURSE:
             eCOURSE=static_cast<COURSE>(answer.iParameter);
@@ -480,15 +451,26 @@ MENU_ANSW SimMgr::Menu()
         }
         //--------------------------------
 
-        //aktualizujemy prompt
-        if (p_mainmenu->getCurrentIndex() == 1)  //pozycja "Zaplanuj lot"
-        {
-            p_prompt->Switch(1);  //wyswietli dane o planie lotu
-        }
-        else
-        {
-            p_prompt->Switch(0);  //wyswietli "Wybierz:"x
-        }
+        //update of prompt
+		switch (p_mainmenu->getCurrentIndex())
+		{
+		case 0:
+			p_prompt->Switch(0);  //show "Select:"
+			break;
+		case 1:  
+			p_prompt->Switch(1);  //show flightplan settings
+			break;
+		case 2:
+			if (vUavLst.size() < 1)
+			{
+				p_prompt->Switch(3);	//show "you need at least one aircraft.."
+			}
+			else
+			{
+				p_prompt->Switch(0);   //show "Select:"
+			}
+			break;
+		}
         //--------------------
 
 
@@ -499,8 +481,15 @@ MENU_ANSW SimMgr::Menu()
 		}
 		if (answer.eANSWER == MENU_ANSW::FLY)
 		{
-			p_prompt->Switch(2);
-			functionanswer = answer;
+			if (vUavLst.size() < 1)
+			{
+				answer.eANSWER = MENU_ANSW::NOTHING;
+			}
+			else
+			{
+				p_prompt->Switch(2);
+				functionanswer = answer;
+			}
 		}
 		//-----------------------------------------------
 
@@ -523,7 +512,7 @@ MENU_ANSW SimMgr::Menu()
 core::stringw SimMgr::getFlightPlan()
 {
     string text=pDict->get(29);  //"Wybranych Samolotow:"
-    text+=to_string(vUavList.size());
+    text+=to_string(vUavLst.size());
     text+=pDict->get(30);  //"kurs:"
     switch (eCOURSE)
     {
@@ -606,9 +595,9 @@ core::stringw SimMgr::getFlapsAndGearText(UavNode* uav)
 	return outtext.c_str();
 }
 
-void SimMgr::LoadPlan(int choice=0)
+void SimMgr::LoadPlan()
 {
-    for (auto k:vUavList)  //dodajemy maszyny odpowiedniego typu, zapisanego w liscie vUavlist
+    for (auto k:vUavLst)  //dodajemy maszyny odpowiedniego typu, zapisanego w liscie vUavlst
     {
         if (bImperialUnits)
         {
@@ -663,7 +652,7 @@ void SimMgr::LoadPlan(int choice=0)
         item3.sDescription=L"#";
         item3.sDescription+=to_wstring(i).c_str();
         item3.sDescription+=L" (";
-        item3.sDescription+=pUavArr->getUav(i)->getType();
+        item3.sDescription+=pUavArr->getUav(i)->getType().c_str();
         item3.sDescription+=L")";
         item3.iParameter=i;
         item3.eANSWER=MENU_ANSW::CHOOSEUAV;
@@ -704,7 +693,7 @@ void SimMgr::LoadPlan(int choice=0)
     //-----------------
 
     //scene::ICameraSceneNode* camera = pScene->addCameraSceneNodeFPS(0,100.0f,0.05f);//tymczasowa kamera, trzeba na koniec zniszczyć
-    core::aabbox3d<f32> terrainbox = pTerrain->getBoundingBox();
+    core::aabbox3d<f32> terrainbox = vTerrain[0]->getBoundingBox();
     //dodajemy kamerę
     pCamera = new Camera(pDevice,pSett,pDict,uParamRefresh);
     pCamera->getIrrCamera()->setFarValue(2*terrainbox.getExtent().getLength());
@@ -1271,7 +1260,6 @@ void SimMgr::Fly()noexcept  //contains simulation loop - to speed up, it is noex
                     {
                         //doszlo do zderzenia
                         uavarray[i]->Crash(collisionpoint);
-                        cout<<"czas zderzenia:"<<(tzero-tstart)/1000.0f<<endl;
                     }
                 }
             }
@@ -1295,4 +1283,142 @@ void SimMgr::Fly()noexcept  //contains simulation loop - to speed up, it is noex
 #endif
         
     }
+}
+void SimMgr::SetTerrain()
+{
+	//dodajemy teren - pustynię
+	
+	string softterrainpath("terrain/soft");
+	string hardterrainpath("terrain/hard");
+	scene::IMeshSceneNode* meshnode = nullptr;
+	for(int i=0;;++i)
+	{
+		meshnode = pScene->addMeshSceneNode(pScene->getMesh((softterrainpath+to_string(i)+".3ds").data()));
+		if (!meshnode)  //there was no mesh file with given i number
+		{
+			break;
+		}
+		vTerrain.push_back(meshnode);
+		++iSoftTerrainNum;
+	}
+	for (int i = 0;; ++i)
+	{
+		meshnode = pScene->addMeshSceneNode(pScene->getMesh((hardterrainpath + to_string(i) + ".3ds").data()));
+		if (!meshnode)  //there was no mesh file with given i number
+		{
+			break;
+		}
+		vTerrain.push_back(meshnode);
+	}
+	if (vTerrain.empty())
+	{
+		SimExceptContainer capsule;
+		capsule.sText = "There is not any terrain *.3ds file";
+		throw capsule;
+	}
+	for (int i=0;i<vTerrain.size();++i)	
+	{
+		vTerrain[i]->setMaterialFlag(video::EMF_LIGHTING, true);//dynamic light
+		string softtexturepath(softterrainpath + to_string(i)+'-');
+		string hardtexturepath(hardterrainpath + to_string(i-iSoftTerrainNum) + '-');
+		video::ITexture* lasttexture = nullptr;
+		video::ITexture* curtexture = nullptr;
+		for (int j = 0; j<vTerrain[i]->getMaterialCount(); ++j)
+		{
+			if (i < iSoftTerrainNum)
+			{
+				curtexture = pDriver->getTexture((softtexturepath + to_string(j) + ".jpg").data());
+			}
+			else
+			{
+				curtexture = pDriver->getTexture((hardtexturepath + to_string(j) + ".jpg").data());
+			}
+
+			if (curtexture == nullptr)
+			{
+				curtexture = lasttexture;
+			}
+			else
+			{
+				lasttexture = curtexture;
+			}
+			vTerrain[i]->getMaterial(j).setTexture(0, curtexture);
+
+			vTerrain[i]->getMaterial(j).AmbientColor.setAlpha(255);
+			vTerrain[i]->getMaterial(j).AmbientColor.setRed(100);
+			vTerrain[i]->getMaterial(j).AmbientColor.setGreen(100);
+			vTerrain[i]->getMaterial(j).AmbientColor.setBlue(100);
+			vTerrain[i]->getMaterial(j).SpecularColor.setAlpha(128);
+			vTerrain[i]->getMaterial(j).SpecularColor.setRed(0);
+			vTerrain[i]->getMaterial(j).SpecularColor.setGreen(0);
+			vTerrain[i]->getMaterial(j).SpecularColor.setBlue(0);
+			vTerrain[i]->getMaterial(j).DiffuseColor.setAlpha(128);
+			vTerrain[i]->getMaterial(j).DiffuseColor.setRed(50);
+			vTerrain[i]->getMaterial(j).DiffuseColor.setGreen(50);
+			vTerrain[i]->getMaterial(j).DiffuseColor.setBlue(50);
+		}
+		//now vTerrain and iSoftTerrainNum must be relayed to UavArray, so that UavArray can send them to Uavs in LoadData()
+		pUavArr->vTerrain = vTerrain;
+		pUavArr->iSoftTerrainNum = iSoftTerrainNum;
+	}
+
+
+	//pTerrain = pScene->addMeshSceneNode(pScene->getMesh(terrainmeshpath.data()));
+	//if (!pTerrain)
+	//{
+	//	SimExceptContainer capsule;
+	//	throw capsule;
+	//}
+	//pTerrain->setMaterialFlag(video::EMF_LIGHTING, true);//dynamic light
+	//													 //na teren nakladamy teksture
+	//string terraintexturepath("terrain/" + mapname + ".jpg");
+	////pTerrain->setMaterialTexture(0,pDriver->getTexture(terraintexturepath.data()));
+	//for (int i = 0; i<pTerrain->getMaterialCount(); ++i)
+	//{
+	//	pTerrain->getMaterial(i).setTexture(0, pDriver->getTexture(terraintexturepath.data()));
+	//	pTerrain->getMaterial(i).AmbientColor.setAlpha(255);
+	//	pTerrain->getMaterial(i).AmbientColor.setRed(100);
+	//	pTerrain->getMaterial(i).AmbientColor.setGreen(100);
+	//	pTerrain->getMaterial(i).AmbientColor.setBlue(100);
+	//	pTerrain->getMaterial(i).SpecularColor.setAlpha(255);
+	//	pTerrain->getMaterial(i).SpecularColor.setRed(0);
+	//	pTerrain->getMaterial(i).SpecularColor.setGreen(0);
+	//	pTerrain->getMaterial(i).SpecularColor.setBlue(0);
+	//}
+	//ustawiamy swiatlo ambient
+	float col = pSett->getVar<float>("ambientlightlevel");
+	pScene->setAmbientLight(video::SColorf(col, col, col, col));
+	//ustawiamy kolor cienia
+	pScene->setShadowColor(video::SColor(pSett->getVar<unsigned>("shadowintensity"), 0, 0, 0));
+	//sky color
+	core::vector3df rgb = pSett->getVar<core::vector3df>("skycolor");
+	SkyColor = video::SColor(255, u32(rgb.X), u32(rgb.Y), u32(rgb.Z));
+
+	//dodajemy swiatlo kierunkowe
+	core::vector3df lightpos(pSett->getVar<float>("light_x"), pSett->getVar<float>("light_y"), pSett->getVar<float>("light_z"));
+	col = pSett->getVar<float>("lightlevel");
+	pLight = pScene->addLightSceneNode(0, lightpos, video::SColorf(col, col, col), pSett->getVar<float>("lightradius"));
+	if (!pLight)
+	{
+		SimExceptContainer capsule;
+		capsule.sText = pDict->get(3);
+		throw capsule;
+	}
+
+	video::ITexture*  lightbillboardtexture = pDriver->getTexture("terrain/sun.bmp");
+	if (lightbillboardtexture)
+	{
+		float lpicsize = pSett->getVar<float>("lightpicturesize");
+		scene::IBillboardSceneNode* lightbillboard = pScene->addBillboardSceneNode(static_cast<scene::ISceneNode*>(pLight), core::dimension2df(lpicsize, lpicsize));
+		lightbillboard->setMaterialFlag(video::EMF_LIGHTING, false);
+		lightbillboard->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+		lightbillboard->setMaterialTexture(0, lightbillboardtexture);
+	}
+	//dodajemy triangle selector
+	for (auto k : vTerrain)
+	{
+		scene::ITriangleSelector* selector = pScene->createOctreeTriangleSelector(k->getMesh(), k, 128);
+		k->setTriangleSelector(selector);
+		selector->drop();
+	}
 }

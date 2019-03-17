@@ -2,9 +2,11 @@
 #define UAVNODE_H
 #include <irrlicht.h>
 #include <cmath>
-
 #include "settingsmgr.h"  //zeby przeciazac operator<< dla wektorów
 #include <iostream>//do wykasowania
+const unsigned MINPARTICLESRATE = 5;
+const unsigned MAXPARTICLESRATE = 10;
+const core::vector3df PARTICLESPEED(0, 0.002f, 0);
 using namespace std;//do wykasowania
 
 using namespace irr;
@@ -42,7 +44,9 @@ struct GearProps
 	float fDeflection;  //deflection at current frame
 	float fTravel;			//loaded from file,	maximum deflection that the gear withstands
 	float fSpringCoef;	//loaded from file	
-	float fDampCoef;	//loaded from file	
+	float fDampCoef;	//loaded from file
+	core::vector3df  RetrAxisLocation;	//loaded from file, location of retraction axis
+	core::vector3df  RetrAxisRotation;	//loaded from file, location of retraction angle
 };
 
 struct Component
@@ -53,6 +57,7 @@ struct Component
     core::vector3df Xvector;  //wektor jednostkowy kierunku X komponentu, w układzie aircraft
     core::vector3df Yvector;  //analogicznie
     core::vector3df Zvector;
+	scene::IMeshSceneNode* MeshObject = nullptr;  //additional visible mesh object representing given component
     union
     {
         FoilProps FoilP;
@@ -69,10 +74,13 @@ class UavArray;  //deklaracja zapowiadająca
 class UavNode : public scene::ISceneNode
 {
 private:
-    core::stringw sType;
+    string sType;
     video::IVideoDriver* pDriver;
     scene::IMeshSceneNode* pMeshChild=nullptr;
+    scene::IParticleSystemSceneNode* pParticSys = nullptr;
 	scene::ISceneCollisionManager* pCollMan = nullptr;
+	vector<scene::IMeshSceneNode*> vTerrain;
+	int iSoftTerrainNum = 0;
     static VectorIntegralFuncType pVfunc;
     static QuaternionIntegralFuncType pQfunc;
     float fMass=1;  //żeby nie było zero
@@ -94,16 +102,8 @@ private:
 	float fFlapTimeToTransfer;	//time to complete current operation of retracting or extending in seconds, positive, up to down, negative: down to up
 
 public:
-    UavNode(scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id,scene::IMesh* mesh)  //konstruktor - jedyny, argumentowy
-        : scene::ISceneNode(parent, mgr, id)
-    {
-        pDriver=mgr->getVideoDriver();  //od scene managera pobieramy wskaźnik do karty graficznej
-		pCollMan = mgr->getSceneCollisionManager();
-        pMeshChild = mgr->addMeshSceneNode(mesh,static_cast<scene::ISceneNode*>(this),id);
-        //iMaterialNum=mesh->getMeshBufferCount();
-        pMeshChild->setMaterialFlag(video::EMF_LIGHTING, true);  //dynamic light
-        pMeshChild->addShadowVolumeSceneNode();  //dzięki temu będzie rzucać cienie
-    }
+	UavNode(scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id, scene::IMesh* mesh, const char type[]);  //constructor, one and only
+
     virtual ~UavNode()  //destruktor
     {
         if (pComp)
@@ -145,6 +145,14 @@ public:
     {
         return pMeshChild->getMaterial(num);
     }
+	virtual void setType(string type)
+	{
+		sType = type;
+	}
+	virtual string getType()
+	{
+		return sType;
+	}
     virtual scene::IMeshSceneNode* getMeshChild()
     {
         return pMeshChild;
@@ -152,10 +160,6 @@ public:
     virtual core::vector3df getFPPCamPos()
     {
         return FPPCamPos;
-    }
-    virtual core::stringw getType()
-    {
-        return sType;
     }
     virtual void setControlSignals(const core::vector3df& signals)
     {
@@ -372,10 +376,22 @@ public:
 				*statenumber -= 1;
 			}
 		}
-		//Actions on landing gear
+		//Actions on retractable landing gear
 		if (fGearTimeToTransfer > 0)
 		{
 			fGearTimeToTransfer -= deltaseconds;
+			for (int i = 0; i < iCompNum; ++i)  //  setting proper angle when moving gear OUT, and setting it visible at the beginning
+			{
+				if (pComp[i].MeshObject !=nullptr)
+				{
+					pComp[i].MeshObject->setVisible(true);
+					if (pComp[i].eCOMPTYPE == COMPONENTTYPE::GEAR)
+					{
+						float anglefraction = fGearTimeToTransfer / fGearTransferTime;
+						pComp[i].MeshObject->setRotation(pComp[i].GearP.RetrAxisRotation*anglefraction);
+					}
+				}
+			}
 			if (fGearTimeToTransfer <= 0)
 			{
 				fGearTimeToTransfer = 0;
@@ -385,12 +401,28 @@ public:
 		if (fGearTimeToTransfer < 0)
 		{
 			fGearTimeToTransfer += deltaseconds;
+			for (int i = 0; i < iCompNum; ++i)  //  setting proper angle when moving gear IN, and setting it INvisible at the end
+			{
+				if ( pComp[i].MeshObject != nullptr)
+				{
+					if (pComp[i].eCOMPTYPE == COMPONENTTYPE::GEAR)
+					{
+						float anglefraction = 1 + fGearTimeToTransfer / fGearTransferTime;
+						pComp[i].MeshObject->setRotation(pComp[i].GearP.RetrAxisRotation*anglefraction);
+					}
+					if (fGearTimeToTransfer >= 0)
+					{
+						pComp[i].MeshObject->setVisible(false);
+					}
+				}
+			}
 			if (fGearTimeToTransfer >= 0)
 			{
 				fGearTimeToTransfer = 0;
 				if (bRetractableGear == true)
 				{
 					bGearDown = false;
+
 				}
 			}
 		}
@@ -641,6 +673,7 @@ for (int i = 0; i < iCompNum; ++i)
 			{
 				if (bGearDown == true)
 				{
+					static bool touchedearlier = false;
 					core::vector3df downpoint = pComp[i].Location;	//in aircraft CS
 					core::vector3df uppoint = downpoint + pComp[i].Yvector*pComp[i].GearP.fTravel;  //in aircraft CS
 					AbsoluteTransformation.rotateVect(downpoint);  //rotated to global CS
@@ -648,10 +681,53 @@ for (int i = 0; i < iCompNum; ++i)
 					downpoint += getPosition();		//global CS
 					uppoint += getPosition();		//global CS
 					core::line3df geartravel(downpoint, uppoint);
+					float fGripCoef;
+					float fRollCoef;
 					core::vector3df collisionpoint;
 					core::triangle3df triangle;
-					if (pCollMan->getSceneNodeAndCollisionPointFromRay(geartravel, collisionpoint, triangle) != nullptr)
+					scene::ISceneNode* touchedterrain = nullptr;
+					if ((touchedterrain = pCollMan->getSceneNodeAndCollisionPointFromRay(geartravel, collisionpoint, triangle)) != nullptr)
 					{
+
+						for (int j = 0; j < vTerrain.size(); ++j)
+						{
+							if (static_cast<scene::ISceneNode*>(vTerrain[j]) == touchedterrain)  //if terrain is soft (grass, bare ground)
+							{
+								if (j<iSoftTerrainNum)
+								{
+									if (!(cntr % 20))
+									{
+									}
+									fGripCoef = fGripcoefrough;
+									fRollCoef = fRollcoefrough;
+									pParticSys->getEmitter()->setMaxParticlesPerSecond(MAXPARTICLESRATE * u32(Speed.getLength() * 0.1f));
+									//pParticSys->setVisible(true);
+									touchedearlier = true;
+								}
+								else  //terrain is hard (concrete, asphalt)
+								{
+									/*if (!(cntr % 20))
+									{
+										cout << "terrain: hard, i = " << i << endl;
+									}*/
+									fGripCoef = fGripcoefconcrete;
+									fRollCoef = fRollcoefconcrete;
+									if (touchedearlier == false)
+									{
+										pParticSys->getEmitter()->setMaxParticlesPerSecond(MAXPARTICLESRATE*10);
+										//pParticSys->setVisible(true);
+										//cout << "touchdown! Gear: " << i << endl;
+										touchedearlier = true;
+									}
+									else
+									{
+										pParticSys->getEmitter()->setMaxParticlesPerSecond(0);
+										//pParticSys->setVisible(false);
+									}
+								}
+							}
+
+						}
 						core::vector3df compairspeed = (RotSpeed.crossProduct(pComp[i].Location)) + uavairspeed;  //airspeed at wheel - aircraft CS
 
 						//calculation of force normal to ground-------------------------------
@@ -678,14 +754,14 @@ for (int i = 0; i < iCompNum; ++i)
 							{
 								if ((pComp[i].Location.X > 0) && (fBrakeRightSignal > 0))
 								{
-									brakecoef = fGripcoefrough * fBrakeRightSignal;
+									brakecoef = fGripCoef * fBrakeRightSignal;
 								}
 								if ((pComp[i].Location.X < 0) && (fBrakeLeftSignal > 0))
 								{
-									brakecoef = fGripcoefrough * fBrakeLeftSignal;
+									brakecoef = fGripCoef * fBrakeLeftSignal;
 								}
 							}
-							rollresist *= compforce.getLength() * (fRollcoefrough * (1 + compairspeed.getLength() * 0.05)+brakecoef);
+							rollresist *= compforce.getLength() * (fRollCoef * (1 + compairspeed.getLength() * 0.05)+brakecoef);
 							/*if (!(cntr % 20))
 							{
 								cout << i << " rollresist: " << rollresist << " compairspeed: "<<compairspeed.getLength()<<endl;
@@ -698,7 +774,7 @@ for (int i = 0; i < iCompNum; ++i)
 						{
 							//calculation of wheel side force-------------------------------------
 							float sidespeed = pComp[i].Xvector.dotProduct(compairspeed);
-							float realgripcoef = (abs(sidespeed) > fGripspeed ? fGripcoefrough : fGripcoefrough * (abs(sidespeed) / fGripspeed));		//whether to take full grip coef, or only fraction for low slip speed
+							float realgripcoef = (abs(sidespeed) > fGripspeed ? fGripCoef : fGripCoef * (abs(sidespeed) / fGripspeed));		//whether to take full grip coef, or only fraction for low slip speed
 							if (sidespeed < 0) { realgripcoef *= -1; }
 							core::vector3df sideforce = pComp[i].Zvector.crossProduct(trianglenormal);
 							sideforce.normalize();
@@ -714,14 +790,14 @@ for (int i = 0; i < iCompNum; ++i)
 							{
 								if ((pComp[i].Location.X > 0) && (fBrakeRightSignal > 0))
 								{
-									brakecoef = fGripcoefrough * fBrakeRightSignal;
+									brakecoef = fGripCoef * fBrakeRightSignal;
 								}
 								if ((pComp[i].Location.X < 0) && (fBrakeLeftSignal > 0))
 								{
-									brakecoef = fGripcoefrough * fBrakeLeftSignal;
+									brakecoef = fGripCoef * fBrakeLeftSignal;
 								}
 							}
-							core::vector3df rollresist = frontspeednormalized * compforce.getLength() * (fRollcoefrough*(1 + frontspeed.getLength() * 0.05)+brakecoef);
+							core::vector3df rollresist = frontspeednormalized * compforce.getLength() * (fRollCoef*(1 + frontspeed.getLength() * 0.05)+brakecoef);
 
 							/*if (!(cntr % 20))
 							{
@@ -753,6 +829,9 @@ for (int i = 0; i < iCompNum; ++i)
 					else
 					{
 						pComp[i].GearP.fDeflection = 0;
+						pParticSys->getEmitter()->setMaxParticlesPerSecond(0);
+						//pParticSys->setVisible(false);
+						touchedearlier = false;
 					}
 				}
 

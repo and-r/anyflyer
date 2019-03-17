@@ -1,6 +1,7 @@
 #ifndef UAVARRAY_H
 #define UAVARRAY_H
 #include <irrlicht.h>
+#include <string>
 #include "uavnode.h"
 #include "settingsmgr.h"
 #include "dictionary.h"
@@ -19,15 +20,20 @@ private:
     int iNum=0;
     UavNode** pArray=nullptr;  //tablica wskaźników do dronów
 public:
+	vector<scene::IMeshSceneNode*> vTerrain;
+	int iSoftTerrainNum = 0;
     UavArray(IrrlichtDevice* device,SettingsMgr* sett,Dictionary* dict):pDevice(device),pSett(sett),pDict(dict)  //konstuktor parametryczny - jedyny
-    {}
+    {
+
+	}
     ~UavArray()
     {
         DeleteAll();
     }
 
-    UavNode* Add(int type,COURSE course = COURSE::N,float alt = 1000.0f);   //dodaje pojedynczy samolot do tablicy
-    void LoadData(UavNode*);  //wywoływana w Add, wczytuje dane maszyny z pliku u(liczba).dat
+    UavNode* Add(string type,COURSE course = COURSE::N,float alt = 1000.0f);   //dodaje pojedynczy samolot do tablicy
+    void LoadData(UavNode*);  //called by Add(..) method
+	void AssignTexture(string, scene::IMeshSceneNode*);
     void DeleteAll()
     {
         if (iNum <= 0)

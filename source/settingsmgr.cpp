@@ -38,4 +38,3 @@ int SettingsMgr::ReadSettings(const char* filename)
     ifstrum.close();
     return 0;  //kod prawidłowego wyjścia
 }
-

@@ -1,0 +1,121 @@
+(mass) {110}                 mass in kilograms
+(cog) {0,0,0}             center of mass in meters
+(mominert) {460,66,530}   moments of inertia: xx, yy, zz, unit: kg*m^2
+(controlderiv) {1.25}          derivative of control surface coefficient
+(fppcampos) {0,1,1}          position of fpp camera
+(defaultspeed) {5}         default initial speed, m/s
+(compnum) {8}                number of components      
+
+(0comptype) {1}           1-airfoil, mid-wing
+(0location) {0,7.4,0}      m
+(0rotation) {7,0,0}       deg
+(0size) {14.2}               m^2
+(0chartid) {0}            id of characteristics
+(0ar) {3.9}                 aspect ratio
+(0controlsize) {0}            control surface area/airfoil area
+(0controlangleup) {0}           max angle up, deg
+(0controlangledown) {0}
+(0controlsensit) {0,0,0}        elevator sensitivity,rudder sens.,aileron sens.
+
+(1comptype) {1}           right part
+(1location) {3.7,6.3,-0.3}
+(1rotation) {4,0,-46}
+(1size) {5}
+(1controlsize) {0.1}
+(1controlangleup) {0}
+(1controlangledown) {50}
+(1controlsensit) {-1,0,-1}
+(1chartid) {0}
+(1ar) {3.9}
+
+(2comptype) {1}            left part
+(2location) {-3.7,6.3,-0.3}
+(2rotation) {4,0,46}
+(2size) {5}
+(2controlsize) {0.1}
+(2controlangleup) {0}
+(2controlangledown) {50}
+(2controlsensit) {-1,0,1}
+(2chartid) {0}
+(2ar) {3.9}
+
+(3comptype) {0}            0-fuselage
+(3location) {0,0,0}
+(3rotation) {0,0,0}
+(3length) {2}
+(3diameter) {2}
+(3cdcross) {0.5}        drag coefficient for cross-section of fuselage, related to max width of that fuselage times unit length, 0.5 is for cylinder
+
+(4comptype) {2}            2-engine
+(4location) {0,0,-0.3}
+(4rotation) {0,0,0}
+(4maxthrust) {530}       max thrust in Newtons, stand.atm. at sea level
+
+(5comptype) {3}		3-landing gear, right foot
+(5retractable) {0}	0-no, 1-yes
+(5swivel)      {1}
+(5braked)      {1}
+(5location) {0.4,-1,0.5}
+(5rotation) {0,0,0}
+(5travel)   {1}
+(5springcoef) {4000}	N/m
+(5dampcoef)   {200}	N/(m*s)
+
+(6comptype) {3}		3-landing gear, left foot
+(6retractable) {0}
+(6swivel)      {1}
+(6braked)      {1}
+(6location) {-0.4,-1,0.5}
+(6rotation) {0,0,0}
+(6travel)   {1}
+(6springcoef) {4000}	N/m
+(6dampcoef)   {200}	N/(m*s)
+
+(7comptype) {3}		3-landing gear, tail?
+(7retractable) {0}
+(7swivel)      {1}
+(7braked)      {1}
+(7location) {0,-1,-0.5}
+(7rotation) {0,0,0}
+(7travel)   {1}
+(7springcoef) {6000}	N/m
+(7dampcoef)   {300}	N/(m*s)
+
+(0c0) {0,0.25,-0.04}  characteristics no 0,angle 0 deg,x:not used,y:CL,z:CD
+(0c1) {0,1.2,-0.08} characteristics no 0, angle 10 deg
+(0c2) {0,1,2,-0.2}
+(0c3) {0,0.9,-0.6}
+(0c4) {0,1.05,-0.9}
+(0c5) {0,1.05,-1.2}
+(0c6) {0,0.9,-1.5}
+(0c7) {0,0.65,-1.7}
+(0c8) {0,0.35,-1.8}
+(0c9) {0,0.05,-1.8}
+(0c10) {0,-0.25,-1.75}
+(0c11) {0,-0.5,-1.6}
+(0c12) {0,-0.75,-1.45}
+(0c13) {0,-0.9,-1.25}
+(0c14) {0,-0.95,-1}
+(0c15) {0,-0.85,-0.6}
+(0c16) {0,-0.65,-0.3}
+(0c17) {0,-0.85,-0.15}
+(0c18) {0,0,-0.03}
+
+(0c35) {0,0,-0.052}
+(0c34) {0,0,-0.15}
+(0c33) {0,0,-0.6}
+(0c32) {0,0,-0.9}
+(0c31) {0,0,-1.2}
+(0c30) {0,0,-1.5}
+(0c29) {0,0,-1.7}
+(0c28) {0,0,-1.8}
+(0c27) {0,0,-1.8}
+(0c26) {0,0,-1.75}
+(0c25) {0,0,-1.6}
+(0c24) {0,0,-1.45}
+(0c23) {0,0,-1.25}
+(0c22) {0,0,-1}
+(0c21) {0,0,-0.6}
+(0c20) {0,0,-0.3}
+(0c19) {0,0,-0.15}
+
