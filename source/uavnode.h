@@ -435,10 +435,18 @@ public:
 		core::vector3df momenttotal{};  //moment główny, wyzerowany
 
 		Reaction(deltaseconds, forcetotal, momenttotal, wind);  //otrzymujemy wektor główny siły i mom. główny w układzie samolot
+
+	/*	static int cntr = 0;
+		if (!(cntr % 20))
+		{
+			cout << "G = " << (forcetotal/(fMass*fGaccel)).getLength() << endl;
+		}
+		++cntr;*/
 											
 		AbsoluteTransformation.rotateVect(forcetotal);  //teraz forcetotal jest w układzie globalnym
         core::vector3df acceltotal = (forcetotal / fMass) + core::vector3df(0, -fGaccel, 0);  //suma przyśpieszeń działająca na samolot
-																							  //core::vector3df acceltotal=(core::vector3df(0,0,0)/fMass)+core::vector3df(0,-fGaccel,0);  //suma przyśpieszeń działająca na dron
+		
+
 
 		Speed += acceltotal*(deltaseconds);  //scałkowane przyśpieszenie = przyrost prędkości
 
@@ -448,9 +456,8 @@ public:
 		//później wartości kątowe
 		core::vector3df oldrotspeed = RotSpeed;  //zapisanie poprzedniej wartości
 
-												 //tutaj trzeba obliczyć przyrost prędkości kątowej wynikający z działania  momentu głównego i dodać go do RotSpeed
-												 //core::vector3df pewienwektor=(momenttotal/MomInert)*deltaseconds*180/PI;
-												 //cout<<"przyrost deg/s="<<pewienwektor<<endl<<endl;
+		//tutaj trzeba obliczyć przyrost prędkości kątowej wynikający z działania  momentu głównego i dodać go do RotSpeed
+								
 		RotSpeed += (momenttotal / MomInert)*deltaseconds;
 		if (RotSpeed.X*oldrotspeed.X<0)
 		{
