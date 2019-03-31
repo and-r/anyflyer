@@ -100,6 +100,7 @@ private:
 	bool bGearDown;			//current position up/down
 	float fFlapTransferTime;	//loaded from file, time of retracting or extending flaps between neighboring states in seconds
 	float fFlapTimeToTransfer;	//time to complete current operation of retracting or extending in seconds, positive, up to down, negative: down to up
+	bool bTracer=false;
 
 public:
 	UavNode(scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id, scene::IMesh* mesh, const char type[]);  //constructor, one and only
@@ -134,29 +135,26 @@ public:
         //tutaj nic nie ma, bo widoczne ma być tylko dziecko czyli pMeshChild
     }
     virtual const core::aabbox3d<f32>& getBoundingBox() const
-    {
-        return pMeshChild->getBoundingBox();
-    }
+    {return pMeshChild->getBoundingBox();}
+
     virtual u32 getMaterialCount()
-    {
-        return pMeshChild->getMaterialCount();
-    }
+    {return pMeshChild->getMaterialCount();}
+
     virtual video::SMaterial& getMaterial(u32 num)
-    {
-        return pMeshChild->getMaterial(num);
-    }
+    {return pMeshChild->getMaterial(num);}
+
 	virtual void setType(string type)
-	{
-		sType = type;
-	}
+	{sType = type;}
+
 	virtual string getType()
-	{
-		return sType;
-	}
+	{return sType;}
+
     virtual scene::IMeshSceneNode* getMeshChild()
-    {
-        return pMeshChild;
-    }
+    { return pMeshChild;}
+
+	virtual scene::IParticleSystemSceneNode* getParticSys()
+	{return pParticSys;}
+
     virtual core::vector3df getFPPCamPos()
     {
         return FPPCamPos;
@@ -321,6 +319,16 @@ public:
             pMeshChild->setVisible(false);
         }
     }
+	virtual void SetTracer(bool value)
+	{
+		if (eSTATE != FLIGHTSTATE::CRASHED)
+		{
+			bTracer = value;
+		}
+	}
+
+	virtual bool GetTracer()
+	{return bTracer;}
 
     //metody całkujące wektorowe
     static core::vector3df IntegralEulerVector(core::vector3df vm1, core::vector3df v0,float deltat)
@@ -480,13 +488,13 @@ public:
 		rotation *= 180 / PI;  //przeliczenie na stopnie
 							   //setRotation(rott0.getMatrix().getRotationDegrees());
 		setRotation(rotation);
-		//    if (!(cntr%20))
-		//    {
-		//        core::vector3df rotdiag=rott0.getMatrix().getRotationDegrees();
-		//        cout<<"getrotationdegrees="<<rotdiag<<endl;
-		//    }
-		//    ++cntr;
-		//setPosition(getPosition()+Speed*deltaseconds);  całkowanie t0
+		
+		if (bTracer == true)   //if bTracer flag is set on, generate smoke
+		{
+			//pParticSys->getEmitter()->setMaxParticlesPerSecond(MAXPARTICLESRATE * u32(Speed.getLength() * 0.1f));
+			pParticSys->getEmitter()->setMaxParticlesPerSecond(MAXPARTICLESRATE * 10);
+		}
+
 		return getPosition();
 	}
 protected:
@@ -698,13 +706,10 @@ for (int i = 0; i < iCompNum; ++i)
 
 						for (int j = 0; j < vTerrain.size(); ++j)
 						{
-							if (static_cast<scene::ISceneNode*>(vTerrain[j]) == touchedterrain)  //if terrain is soft (grass, bare ground)
+							if (static_cast<scene::ISceneNode*>(vTerrain[j]) == touchedterrain)  //terrain is soft (grass, bare ground)
 							{
 								if (j<iSoftTerrainNum)
 								{
-									if (!(cntr % 20))
-									{
-									}
 									fGripCoef = fGripcoefrough;
 									fRollCoef = fRollcoefrough;
 									pParticSys->getEmitter()->setMaxParticlesPerSecond(MAXPARTICLESRATE * u32(Speed.getLength() * 0.1f));

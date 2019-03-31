@@ -34,7 +34,8 @@ G: opuszczanie/podnoszenie podwozia
 Ruch myszy : drazek sterowy
 Rolka myszy: trym steru poziomego
 Rolka myszy + Ctrl: przepustnica
-H : wskaznik HUD$
+H : wskaznik HUD
+T : smugacz$
 20 #nie udalo sie otworzyc pliku:$
 21 #MOC:$
 22 #Menu(ESC)$

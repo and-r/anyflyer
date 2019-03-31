@@ -35,7 +35,8 @@ G: undercarriage toggle
 Mouse move : stick control
 Mouse roller : pitch trim
 Mouse roller + Ctrl: throttle
-H : HUD display$
+H : HUD display
+T : tracer$
 20 #file could not be opened:$
 21 #POWER:$
 22 #Menu(ESC)$

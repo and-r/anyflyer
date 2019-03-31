@@ -45,7 +45,7 @@ private:
     gui::IGUIFont* pFont1=nullptr;//na koniec nie trzeba niszczyc
 
     //inne zmienne
-	wchar_t* cVersion = L"0.2.0";
+	wchar_t* cVersion = L"0.3.0";
     bool bPause = false;  //tymczasowo
     bool bHudOn = true;
     bool bControlled = true;  //czy maszyna jest kontrolowana (ta która jest śledzona przez kamerę)

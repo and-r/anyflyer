@@ -818,7 +818,7 @@ inline bool SimMgr::Input()//obsługa wejścia klawiatury, true - wyjście z pę
         }
         if ((pReceiver->IsKeyPressed(irr::KEY_ESCAPE)) || (answer.iParameter > 0))  //..tak samo jak przycisniecie ESC
         {
-            pSimMenuList->Show();  //otwieramy menu
+            pSimMenuList->Show();  //menu is opened
             pPrompt->Switch(1);
         }
         if (pReceiver->IsKeyPressed(irr::KEY_LEFT))
@@ -838,9 +838,9 @@ inline bool SimMgr::Input()//obsługa wejścia klawiatury, true - wyjście z pę
             pCamera->TurnDown();
         }
     }
-    if (UavNode* uav=pCamera->GetSelectedUav())  //jeśli jest śledzony jakiś uav
+    if (UavNode* uav=pCamera->GetSelectedUav())  //an aircraft is selected
     {
-        if (pReceiver->IsKeyPressed(irr::KEY_TAB))  //przełączanie trybu kamery
+        if (pReceiver->IsKeyPressed(irr::KEY_TAB))  //camera mode switching
         {
           switch (pCamera->GetState())
           {
@@ -853,29 +853,26 @@ inline bool SimMgr::Input()//obsługa wejścia klawiatury, true - wyjście z pę
           default:
             pCamera->Attach(uav,CAMERASTATE::FP);
           }
-
-          //if (pCamera->GetState()==CAMERASTATE::FP)
-          //{pCamera->Attach(uav,CAMERASTATE::TP);}
-          //else
-          //{pCamera->Attach(uav,CAMERASTATE::FP);}
         }
-        if (pReceiver->IsKeyPressed(irr::KEY_KEY_H)) //włączanie/wyłączanie HUD
+        if (pReceiver->IsKeyPressed(irr::KEY_KEY_H)) //HUD on/off
         {
             bHudOn=(bHudOn? false:true);
         }
-//        if (pReceiver->MouseState.LeftButtonDown)
-//        {
-//            cout<<"klinieto przycisk myszy"<<endl;
-//        }
+		if (pReceiver->IsKeyPressed(irr::KEY_KEY_T))  //turn on/turn off smoke emiter (tracer)
+		{
+			bool flag = (uav->GetTracer() ? false : true);
+			if (!flag) { uav->getParticSys()->getEmitter()->setMaxParticlesPerSecond(0); }
+			uav->SetTracer(flag);
+		}
 
-        if (bPause==false && bControlled == true)  //sterowanie dronem za pomocą myszy i klawiatury
+        if (bPause==false && bControlled == true)  //controlling the aircraft by mouse and keyboard
         {
             float wheelvalue=0;
-            if (pReceiver->IsWheelMoved(wheelvalue))  //poruszono kółko myszy, zmiana mocy silnika
+            if (pReceiver->IsWheelMoved(wheelvalue))  //mousewheel is moved
             {
                if (wheelvalue > 0)
                {
-                   if (pReceiver->IsKeyDown(irr::KEY_LCONTROL))  //trym pochylenia w górę
+                   if (pReceiver->IsKeyDown(irr::KEY_LCONTROL))  
                    {
 					   uav->AddPower();
                    }
@@ -887,7 +884,7 @@ inline bool SimMgr::Input()//obsługa wejścia klawiatury, true - wyjście z pę
                }
                else
                {
-                   if (pReceiver->IsKeyDown(irr::KEY_LCONTROL))  //trym pochylenia w dół
+                   if (pReceiver->IsKeyDown(irr::KEY_LCONTROL))
                    {
 					   uav->DecreasePower();
                    }
