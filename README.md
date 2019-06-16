@@ -40,6 +40,9 @@ https://aka.ms/vs/15/release/vc_redist.x64.exe
 
 but the 2015 version should also be sufficient
 
+Linux: Download package file anyflyer*.deb and install it with one of the package manager in your system, e.g. apt-get or GDebi.
+The package was created and tested on Linux Mint 18.2.
+
 ## How to use
 After running .exe file, you are in Main Menu, from here you can start the simulation by choosing Fly, change the settings by Plan your flight, or exit application. When the simulation is started, you are at first in pause mode, which you can turn on/off by space key. You can always enter the Simulation Menu (either paused or unpaused) by pressing ESC. When the simulation is going unpaused, you can operate the menu only by cursor keys/enter because the mouse is used to move the stick. When pause is enabled, you can also use mouse pointer to click menu items. Full key/mouse function list you can find in: Simulation Menu/Keys and control description. To make smooth turns it is sometimes better to use pitch trimmer instead of moving the mouse up/down. There are two important HUD symbols you must be aware when flying: a waterline mark (similar to 'W' letter) indicates where the aircraft's nose is pointed. A small circle represents the speed vector - the aircraft moves exactly at the direction indicated by the circle.
 
@@ -53,10 +56,11 @@ You can alter general settings in settings.txt file. There are three typed of da
 Aircraft data, placed in aircraft directory, consist of three types of files: .dat files contain physical properties, they are arranged similarly to settings.txt., Files with .3ds extension are mesh files of 3D Studio type. There are also textures, one for each aircraft is minimum, however each texture should correspond with one mesh in the .3ds file.
 
 ## Project status
-The project is in an initial status, there are many features to add. However, at this point, a question arises: What is the project's final goal, what and how should it be in the 1.0 version? Well, me, as its creator, can not precisely answer it because my motivation was mainly just making it, not preparing to a certain set of features :-)  
+The project is in an initial status, there are many features to add. However, at this point, a question arises: What is the project's final goal, what and how should it be in the 1.0 version? Well, me, as its creator, can not precisely answer it because my motivation was mainly just making it, not preparing a certain set of features :-)  
 
-Anyway I can imagine functionalities that can be included. First is release as Linux package. Other ones:
-* propeller engines which generate torque
+Anyway I can imagine functionalities that can be added. They are:
+* sound fx
+* propeller engines that generate torque
 * camera zooming
 
 ## License
@@ -66,10 +70,12 @@ Irrlicht, the 3D graphics engine which my application uses, is licensed under zl
 
 dirent.h library: Copyright (c) 1998-2019 Toni Ronkko
 
+Linux package was prepared using Debreate package builder by Jordan Irwin
+
 Aircraft models are created by myself in Rhino3D software. The paraglider wing is based on a model from: http://laboratoridenvol.com/
 
 ## Contact
-AnyFlyer is created by Andrzej Rzoska, feel free to contact me!
+AnyFlyer is created by Andrzej Rzoska, feel free to contact me if you have any questions.
 
 and_r@o2.pl
 
