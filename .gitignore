@@ -4,4 +4,6 @@
 *.ilk
 *.pdb
 *.ipdb
-
+build-Release/
+build-Debug/
+.codelite/

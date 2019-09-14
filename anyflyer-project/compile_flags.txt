@@ -1,0 +1,11 @@
+-I/usr/include/c++/7
+-I/usr/include/x86_64-linux-gnu/c++/7
+-I/usr/include/c++/7/backward
+-I/usr/lib/gcc/x86_64-linux-gnu/7/include
+-I/usr/local/include
+-I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed
+-I/usr/include/x86_64-linux-gnu
+-I/usr/include
+-I/media/ja/BA72B4A872B46B31/Users/Laptop/Documents/Projekty/anyflyer/anyflyer-project
+-I/home/ja/Dokumenty/irrlicht-1.8.4/include
+-DNDEBUG
